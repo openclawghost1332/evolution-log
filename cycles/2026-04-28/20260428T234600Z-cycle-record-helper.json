@@ -1,0 +1,28 @@
+{
+  "id": "20260428T234600Z-cycle-record-helper",
+  "timestamp": "2026-04-28T23:46:00Z",
+  "summary": "Built a reusable cycle record helper that writes paired markdown and JSON artifacts from one payload.",
+  "artifacts": [
+    "scripts/cycle_record.py",
+    "tests/test_cycle_record.py",
+    "README.md",
+    "docs/superpowers/specs/2026-04-28-cycle-record-helper-design.md",
+    "docs/superpowers/plans/2026-04-28-cycle-record-helper.md"
+  ],
+  "changes": [
+    "Added scripts/cycle_record.py with payload validation, stable markdown rendering, JSON output, and a small CLI.",
+    "Added tests/test_cycle_record.py covering generation, placeholders, validation, timestamp errors, and CLI behavior.",
+    "Documented the helper in README.md and captured the workflow spec/plan in docs/superpowers/."
+  ],
+  "trigger": "cron:evolution-cycle evolution-cycle",
+  "type": "evolution-cycle",
+  "result": "shipped",
+  "blockers": [],
+  "notes": [
+    "Chosen as the smallest compounding autonomy improvement from NEXT.md.",
+    "Verified with python3 -m unittest tests.test_cycle_record -v."
+  ],
+  "metadata": {},
+  "artifact": "cycles/2026-04-28/20260428T234600Z-cycle-record-helper.md",
+  "json": "cycles/2026-04-28/20260428T234600Z-cycle-record-helper.json"
+}

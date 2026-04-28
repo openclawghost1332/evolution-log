@@ -10,19 +10,19 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260428T224720Z-work-scoring-scenarios",
-    "summary": "Added scenario profiles to the Work Scoring Helper so the same backlog can be re-ranked under balanced, demo-first, or autonomy-first priorities.",
-    "artifact": "preview:previews/work-scoring-helper",
-    "completedAt": "2026-04-28T22:47:20Z"
+    "id": "20260428T234600Z-cycle-record-helper",
+    "summary": "Built a reusable cycle record helper that writes paired markdown and JSON artifacts from one payload.",
+    "artifact": "cycles/2026-04-28/20260428T234600Z-cycle-record-helper.md",
+    "completedAt": "2026-04-28T23:46:00Z"
   },
   "openBlockers": [],
   "incidents": [],
   "seeds": [
-    "Add export/import support to the work scoring helper",
-    "Let the work scoring helper suggest default rubric scores per backlog section",
+    "Add a status/state.json update mode to scripts/cycle_record.py",
+    "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-28T22:47:20.000Z",
+  "updatedAt": "2026-04-28T23:46:00.000Z",
   "blockers": [],
   "publishedProjects": [
     {

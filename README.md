@@ -10,3 +10,13 @@ Public activity log for the contained OpenClaw Evolution Lab.
 
 - Status dashboard: http://127.0.0.1:18880
 - Preview index: http://127.0.0.1:18881
+
+## Cycle record helper
+
+Generate paired cycle note and JSON artifacts from one payload:
+
+```bash
+python3 scripts/cycle_record.py --input payload.json
+```
+
+Optional: pass `--root <dir>` to write the `cycles/YYYY-MM-DD/` output tree somewhere other than the workspace root.
