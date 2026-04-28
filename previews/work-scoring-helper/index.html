@@ -187,6 +187,7 @@
             <button id="saveBtn">Save scored idea</button>
             <button id="resetBtn" class="secondary">Reset sliders</button>
           </div>
+          <p id="presetHint" class="hint">Use the scorer manually, or pick a backlog candidate to apply a section-aware preset.</p>
         </div>
 
         <div class="panel">
@@ -232,6 +233,27 @@
 
     const sampleBacklog = `## Public micro-project experiments\n- Build a tiny browser tool that solves one concrete developer workflow pain.\n- Publish a minimal static demo with source, README, and a screenshot or preview.\n\n## OpenClaw autonomy improvements\n- Improve cycle recording so artifacts, blockers, and previews are easier to audit.\n- Prototype a better work scoring helper for novelty, feasibility, demo value, OpenClaw usefulness, and compounding autonomy value.`;
 
+    const sectionPresets = [
+      {
+        match: /public micro-project/i,
+        label: 'Public micro-project preset',
+        values: { novelty: 4.5, feasibility: 4, demo: 5, usefulness: 3, compound: 2.5 },
+        rationale: 'Bias toward novelty, shipping speed, and demo punch.'
+      },
+      {
+        match: /autonomy improvement/i,
+        label: 'Autonomy improvement preset',
+        values: { novelty: 3.5, feasibility: 3.5, demo: 2.5, usefulness: 5, compound: 5 },
+        rationale: 'Bias toward compounding value for future cycles.'
+      },
+      {
+        match: /maintenance/i,
+        label: 'Maintenance preset',
+        values: { novelty: 1.5, feasibility: 5, demo: 1.5, usefulness: 3.5, compound: 2.5 },
+        rationale: 'Bias toward low-risk cleanup with modest demo value.'
+      }
+    ];
+
     const criteriaEl = document.getElementById('criteria');
     const scoreEl = document.getElementById('score');
     const summaryEl = document.getElementById('summary');
@@ -241,6 +263,7 @@
     const backlogInputEl = document.getElementById('backlogInput');
     const candidateListEl = document.getElementById('candidateList');
     const transferStatusEl = document.getElementById('transferStatus');
+    const presetHintEl = document.getElementById('presetHint');
 
     function recommendation(score) {
       if (score >= 4.2) return 'Excellent candidate. This is strong cycle material.';
@@ -281,6 +304,20 @@
         });
       });
       computeScore();
+    }
+
+    function findPreset(section) {
+      return sectionPresets.find((preset) => preset.match.test(section || '')) || null;
+    }
+
+    function applyPreset(preset) {
+      rubric.forEach((item) => {
+        if (typeof preset?.values?.[item.key] === 'number') {
+          item.value = preset.values[item.key];
+        }
+      });
+      renderCriteria();
+      presetHintEl.textContent = preset ? `${preset.label}: ${preset.rationale}` : 'Use the scorer manually, or pick a backlog candidate to apply a section-aware preset.';
     }
 
     function loadSaved() {
@@ -348,6 +385,7 @@
     function useCandidate(candidate) {
       ideaEl.value = candidate.title;
       notesEl.value = candidate.note;
+      applyPreset(findPreset(candidate.section));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       ideaEl.focus();
     }
@@ -447,6 +485,7 @@
     document.getElementById('resetBtn').addEventListener('click', () => {
       rubric.forEach(item => item.value = 3);
       renderCriteria();
+      presetHintEl.textContent = 'Use the scorer manually, or pick a backlog candidate to apply a section-aware preset.';
     });
 
     document.getElementById('seedBtn').addEventListener('click', () => {

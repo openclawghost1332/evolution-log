@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260428T181400Z-evolution-health",
-    "summary": "Recorded scheduled health check; status and preview services healthy, latest cycle fresh, and GitHub auth valid for the configured github.user account.",
-    "artifact": "cycle:cycles/2026-04-28/20260428T181400Z-evolution-health.md",
-    "completedAt": "2026-04-28T18:14:00Z"
+    "id": "20260428T184328Z-work-scoring-presets",
+    "summary": "Improved the visible OpenClaw Work Scoring Helper preview with section-aware default rubric presets.",
+    "artifact": "cycle:cycles/2026-04-28/20260428T184328Z-work-scoring-presets.md",
+    "completedAt": "2026-04-28T18:43:28Z"
   },
   "openBlockers": [],
   "incidents": [],
@@ -22,7 +22,7 @@
     "Add a pre-publish secret and host-path lint check",
     "Let the work scoring helper suggest default rubric scores per backlog section"
   ],
-  "updatedAt": "2026-04-28T18:27:00.000Z",
+  "updatedAt": "2026-04-28T18:43:28.000Z",
   "blockers": [],
   "publishedProjects": [
     {

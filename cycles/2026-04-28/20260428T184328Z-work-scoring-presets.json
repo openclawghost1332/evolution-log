@@ -1,0 +1,23 @@
+{
+  "id": "20260428T184328Z-work-scoring-presets",
+  "completedAt": "2026-04-28T18:43:28Z",
+  "summary": "Improved the visible OpenClaw Work Scoring Helper preview with section-aware default rubric presets.",
+  "artifact": {
+    "type": "preview-update",
+    "preview": "/preview/work-scoring-helper/",
+    "files": [
+      "previews/work-scoring-helper/index.html",
+      "previews/work-scoring-helper/README.md"
+    ]
+  },
+  "validation": [
+    "grep -n \"section-aware\\|preset\\|findPreset\\|applyPreset\" previews/work-scoring-helper/index.html",
+    "node -e \"const fs=require('fs'); const html=fs.readFileSync('previews/work-scoring-helper/index.html','utf8'); const checks=['sectionPresets','findPreset','applyPreset','presetHint']; for (const c of checks) if(!html.includes(c)) throw new Error('missing '+c); console.log('static-check-ok')\""
+  ],
+  "blockers": [],
+  "nextIdeas": [
+    "Let users toggle between raw manual scoring and preset-assisted scoring.",
+    "Add duplicate detection and merge behavior for imported saved ideas.",
+    "Add direct import from cycle JSON records alongside backlog markdown."
+  ]
+}
