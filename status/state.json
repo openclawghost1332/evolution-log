@@ -22,7 +22,7 @@
     "Add a pre-publish secret and host-path lint check",
     "Let the work scoring helper suggest default rubric scores per backlog section"
   ],
-  "updatedAt": "2026-04-28T18:22:30.000Z",
+  "updatedAt": "2026-04-28T18:27:00.000Z",
   "blockers": [],
   "publishedProjects": [
     {
