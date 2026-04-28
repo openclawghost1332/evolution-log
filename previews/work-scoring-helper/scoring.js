@@ -53,6 +53,45 @@ export function rankCandidates(candidates, rubric = defaultRubric) {
     .sort((a, b) => b.estimatedScore - a.estimatedScore);
 }
 
+export function formatIdeaBrief({
+  title,
+  section,
+  score,
+  notes,
+  breakdown = [],
+  exportedAt
+}) {
+  const lines = [
+    `# ${title || 'Untitled idea'}`,
+    '',
+    `- Section: ${section || 'General'}`,
+    `- Score: ${Number(score || 0).toFixed(2)} / 5.00`,
+    `- Exported: ${exportedAt || new Date().toISOString()}`,
+    '',
+    '## Rubric breakdown',
+    ...breakdown.map((part) => `- ${part.label}: ${part.value}`)
+  ];
+
+  if (notes) {
+    lines.push('', '## Notes', notes);
+  }
+
+  return lines.join('\n');
+}
+
+export function buildCandidateBrief(candidate, rubric = defaultRubric, exportedAt) {
+  const estimated = estimateCandidate(candidate, rubric);
+
+  return formatIdeaBrief({
+    title: estimated.title,
+    section: estimated.section,
+    score: estimated.estimatedScore,
+    notes: estimated.note,
+    breakdown: estimated.estimatedBreakdown,
+    exportedAt
+  });
+}
+
 export function parseBacklog(markdown) {
   const lines = markdown.split(/\r?\n/);
   const candidates = [];

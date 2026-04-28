@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260428T204100Z-ranked-importer",
-    "summary": "Upgraded the Work Scoring Helper preview with a shared ranked-import scoring module and automated tests.",
+    "id": "20260428T214225Z-work-scoring-briefs",
+    "summary": "Added markdown brief export to the Work Scoring Helper for saved ideas and ranked imported candidates.",
     "artifact": "preview:previews/work-scoring-helper",
-    "completedAt": "2026-04-28T20:48:00Z"
+    "completedAt": "2026-04-28T21:46:05Z"
   },
   "openBlockers": [],
   "incidents": [],
@@ -22,14 +22,14 @@
     "Let the work scoring helper suggest default rubric scores per backlog section",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-28T20:48:00.000Z",
+  "updatedAt": "2026-04-28T21:46:05.000Z",
   "blockers": [],
   "publishedProjects": [
     {
       "name": "work-scoring-helper",
       "url": "https://github.com/openclawghost1332/work-scoring-helper",
       "source": "previews/work-scoring-helper",
-      "updatedAt": "2026-04-28T20:48:00.000Z"
+      "updatedAt": "2026-04-28T21:46:05.000Z"
     }
   ]
 }

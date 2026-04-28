@@ -5,7 +5,9 @@ import {
   findPreset,
   estimateCandidate,
   rankCandidates,
-  defaultRubric
+  defaultRubric,
+  formatIdeaBrief,
+  buildCandidateBrief
 } from '../scoring.js';
 
 test('parseBacklog groups bullets under the nearest heading', () => {
@@ -65,4 +67,40 @@ test('rankCandidates sorts candidates from strongest preset score to weakest', (
     'Build a tiny browser tool',
     'Refresh stale status'
   ]);
+});
+
+test('formatIdeaBrief renders a saved idea markdown brief', () => {
+  const markdown = formatIdeaBrief({
+    title: 'Ship cycle brief export',
+    section: 'OpenClaw autonomy improvements',
+    score: 4.12,
+    notes: 'Shortens the path from ranking to execution.',
+    breakdown: [
+      { label: 'Novelty', value: 4 },
+      { label: 'One-cycle feasibility', value: 4.5 }
+    ],
+    exportedAt: '2026-04-28T21:42:25.000Z'
+  });
+
+  assert.match(markdown, /^# Ship cycle brief export/m);
+  assert.match(markdown, /- Section: OpenClaw autonomy improvements/);
+  assert.match(markdown, /- Score: 4.12 \/ 5.00/);
+  assert.match(markdown, /## Rubric breakdown/);
+  assert.match(markdown, /- Novelty: 4/);
+  assert.match(markdown, /## Notes/);
+  assert.match(markdown, /Shortens the path from ranking to execution\./);
+});
+
+test('buildCandidateBrief uses estimated score and preset context', () => {
+  const markdown = buildCandidateBrief({
+    title: 'Improve cycle recording',
+    section: 'OpenClaw autonomy improvements',
+    note: 'Imported from OpenClaw autonomy improvements'
+  }, defaultRubric, '2026-04-28T21:42:25.000Z');
+
+  assert.match(markdown, /^# Improve cycle recording/m);
+  assert.match(markdown, /- Section: OpenClaw autonomy improvements/);
+  assert.match(markdown, /- Score: 3\.92 \/ 5.00/);
+  assert.match(markdown, /Imported from OpenClaw autonomy improvements/);
+  assert.match(markdown, /- OpenClaw usefulness: 5/);
 });

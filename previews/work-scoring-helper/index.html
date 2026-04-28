@@ -247,7 +247,15 @@
     </div>
   </div>
   <script type="module">
-    import { defaultRubric, findPreset, parseBacklog, rankCandidates, scoreValues } from './scoring.js';
+    import {
+      buildCandidateBrief,
+      defaultRubric,
+      findPreset,
+      formatIdeaBrief,
+      parseBacklog,
+      rankCandidates,
+      scoreValues
+    } from './scoring.js';
 
     const rubric = defaultRubric.map((item) => ({ ...item }));
     const sampleBacklog = `## Public micro-project experiments
@@ -338,6 +346,45 @@
       localStorage.setItem('openclaw-work-candidates', JSON.stringify(items));
     }
 
+    async function copyText(text) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+
+      const input = document.createElement('textarea');
+      input.value = text;
+      input.setAttribute('readonly', 'readonly');
+      input.style.position = 'absolute';
+      input.style.left = '-9999px';
+      document.body.appendChild(input);
+      input.select();
+      const copied = document.execCommand('copy');
+      input.remove();
+
+      if (!copied) throw new Error('Clipboard copy is unavailable in this browser.');
+    }
+
+    async function copySavedIdeaBrief(item) {
+      const markdown = formatIdeaBrief({
+        title: item.title,
+        section: item.section,
+        score: item.score,
+        notes: item.notes,
+        breakdown: item.breakdown,
+        exportedAt: new Date().toISOString()
+      });
+
+      await copyText(markdown);
+      setTransferStatus(`Copied markdown brief for ${item.title}.`);
+    }
+
+    async function copyCandidateBrief(candidate) {
+      const markdown = buildCandidateBrief(candidate, rubric, new Date().toISOString());
+      await copyText(markdown);
+      setTransferStatus(`Copied markdown brief for ${candidate.title}.`);
+    }
+
     function renderSaved() {
       const items = loadSaved().sort((a, b) => b.score - a.score);
       savedIdeasEl.innerHTML = items.length ? '' : '<p class="hint">No saved ideas yet. Score a few candidates and keep the best.</p>';
@@ -352,7 +399,17 @@
             <span>${new Date(item.savedAt).toLocaleString()}</span>
             <span>${item.breakdown.map((part) => `${part.label}: ${part.value}`).join(' • ')}</span>
           </div>
+          <div class="candidate-tools">
+            <button class="ghost" type="button">Copy brief</button>
+          </div>
         `;
+        card.querySelector('button').addEventListener('click', async () => {
+          try {
+            await copySavedIdeaBrief(item);
+          } catch (error) {
+            setTransferStatus(`Copy failed: ${error.message}`);
+          }
+        });
         savedIdeasEl.appendChild(card);
       });
     }
@@ -394,10 +451,18 @@
           </div>
           <p>${candidate.note}</p>
           <div class="candidate-tools">
-            <button class="ghost" type="button">Use in scorer</button>
+            <button class="ghost" type="button" data-action="use">Use in scorer</button>
+            <button class="ghost" type="button" data-action="copy">Copy brief</button>
           </div>
         `;
-        card.querySelector('button').addEventListener('click', () => useCandidate(candidate));
+        card.querySelector('[data-action="use"]').addEventListener('click', () => useCandidate(candidate));
+        card.querySelector('[data-action="copy"]').addEventListener('click', async () => {
+          try {
+            await copyCandidateBrief(candidate);
+          } catch (error) {
+            setTransferStatus(`Copy failed: ${error.message}`);
+          }
+        });
         candidateListEl.appendChild(card);
       });
     }
@@ -438,6 +503,7 @@
           .filter((item) => item && typeof item === 'object')
           .map((item) => ({
             title: typeof item.title === 'string' && item.title.trim() ? item.title.trim() : 'Untitled idea',
+            section: typeof item.section === 'string' && item.section.trim() ? item.section.trim() : 'Imported idea',
             notes: typeof item.notes === 'string' ? item.notes : '',
             score: Number(item.score) || 0,
             breakdown: Array.isArray(item.breakdown) ? item.breakdown : [],
@@ -458,6 +524,7 @@
       const items = loadSaved();
       items.push({
         title,
+        section: 'Manual scoring',
         notes: notesEl.value.trim(),
         score,
         breakdown: rubric.map((item) => ({ label: item.label, value: item.value })),

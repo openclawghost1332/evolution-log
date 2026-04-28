@@ -1,0 +1,20 @@
+{
+  "id": "20260428T214225Z-work-scoring-briefs",
+  "completedAt": "2026-04-28T21:46:05Z",
+  "summary": "Added markdown brief export to the Work Scoring Helper for saved ideas and ranked imported candidates.",
+  "artifact": "preview:previews/work-scoring-helper",
+  "files": [
+    "docs/superpowers/specs/2026-04-28-work-scoring-helper-cycle-brief-design.md",
+    "docs/superpowers/plans/2026-04-28-work-scoring-helper-cycle-brief.md",
+    "previews/work-scoring-helper/index.html",
+    "previews/work-scoring-helper/scoring.js",
+    "previews/work-scoring-helper/tests/scoring.test.mjs",
+    "previews/work-scoring-helper/README.md",
+    "previews/registry.json"
+  ],
+  "verification": [
+    "node --test previews/work-scoring-helper/tests/scoring.test.mjs",
+    "python3 scripts/publish_guard.py previews/work-scoring-helper"
+  ],
+  "blockers": []
+}
