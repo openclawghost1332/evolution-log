@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || exit 0)
+cd "$REPO_ROOT"
+
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)
+if [ "$branch" = "HEAD" ]; then
+  exit 0
+fi
+
+remote=${OPENCLAW_AUTOPUSH_REMOTE:-origin}
+
+if ! git remote get-url "$remote" >/dev/null 2>&1; then
+  exit 0
+fi
+
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  echo "post-commit autopush skipped: repo still dirty" >&2
+  exit 0
+fi
+
+if ! git push "$remote" "$branch"; then
+  echo "post-commit autopush failed for $remote/$branch" >&2
+  exit 1
+fi

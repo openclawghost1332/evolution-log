@@ -16,8 +16,18 @@ Before publishing, check quarantine with:
 node /opt/openclaw-evolution/bin/control.mjs status
 ```
 
+Then run the publish guard against the artifact you plan to ship:
+
+```sh
+python3 scripts/publish_guard.py <path-to-artifact>
+```
+
 If quarantine is active, keep work local and record what would have been
 published.
+
+The workspace repo is configured to auto-push after commits using the managed
+`.githooks/post-commit` hook. Preserve `git config core.hooksPath .githooks`
+when repairing or re-cloning the workspace.
 
 ## Status
 

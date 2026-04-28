@@ -93,6 +93,10 @@ python3 scripts/publish_guard.py <path-to-artifact>
 Treat any finding as a blocker until the offending host path, credential, or
 secret-like string is removed or intentionally excluded from the artifact.
 
+This repository is configured to auto-push after successful commits via the
+managed `.githooks/post-commit` hook. Keep `core.hooksPath=.githooks` in place
+so committed work lands on GitHub without manual follow-up.
+
 ## Failure Rule
 
 When a cycle fails, retry once with a smaller scope. If the smaller attempt also
