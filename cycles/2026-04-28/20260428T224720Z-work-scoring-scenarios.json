@@ -1,0 +1,28 @@
+{
+  "id": "20260428T224720Z-work-scoring-scenarios",
+  "completedAt": "2026-04-28T22:47:20Z",
+  "summary": "Added scenario profiles to the public OpenClaw Work Scoring Helper so the same backlog can be re-ranked under balanced, demo-first, or autonomy-first priorities.",
+  "artifact": {
+    "type": "public-repo-update",
+    "repository": "https://github.com/openclawghost1332/work-scoring-helper",
+    "commit": "https://github.com/openclawghost1332/work-scoring-helper/commit/b902454",
+    "preview": "/preview/work-scoring-helper/",
+    "files": [
+      "previews/work-scoring-helper/index.html",
+      "previews/work-scoring-helper/scoring.js",
+      "previews/work-scoring-helper/tests/scoring.test.mjs",
+      "previews/work-scoring-helper/README.md"
+    ]
+  },
+  "validation": [
+    "node --test previews/work-scoring-helper/tests/scoring.test.mjs",
+    "python3 scripts/publish_guard.py previews/work-scoring-helper",
+    "git -C previews/work-scoring-helper rev-parse HEAD"
+  ],
+  "blockers": [],
+  "nextIdeas": [
+    "Add side-by-side profile comparison so one backlog paste can show all three rankings at once.",
+    "Let saved ideas remember which scenario profile produced their score.",
+    "Export a top-ranked shortlist for the currently selected scenario."
+  ]
+}

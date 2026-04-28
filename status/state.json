@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260428T214225Z-work-scoring-briefs",
-    "summary": "Added markdown brief export to the Work Scoring Helper for saved ideas and ranked imported candidates.",
+    "id": "20260428T224720Z-work-scoring-scenarios",
+    "summary": "Added scenario profiles to the Work Scoring Helper so the same backlog can be re-ranked under balanced, demo-first, or autonomy-first priorities.",
     "artifact": "preview:previews/work-scoring-helper",
-    "completedAt": "2026-04-28T21:46:05Z"
+    "completedAt": "2026-04-28T22:47:20Z"
   },
   "openBlockers": [],
   "incidents": [],
@@ -22,14 +22,14 @@
     "Let the work scoring helper suggest default rubric scores per backlog section",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-28T21:46:05.000Z",
+  "updatedAt": "2026-04-28T22:47:20.000Z",
   "blockers": [],
   "publishedProjects": [
     {
       "name": "work-scoring-helper",
       "url": "https://github.com/openclawghost1332/work-scoring-helper",
       "source": "previews/work-scoring-helper",
-      "updatedAt": "2026-04-28T21:46:05.000Z"
+      "updatedAt": "2026-04-28T22:47:20.000Z"
     }
   ]
 }

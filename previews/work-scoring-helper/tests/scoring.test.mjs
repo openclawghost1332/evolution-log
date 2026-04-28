@@ -7,7 +7,9 @@ import {
   rankCandidates,
   defaultRubric,
   formatIdeaBrief,
-  buildCandidateBrief
+  buildCandidateBrief,
+  getScoreProfile,
+  scoreProfiles
 } from '../scoring.js';
 
 test('parseBacklog groups bullets under the nearest heading', () => {
@@ -103,4 +105,34 @@ test('buildCandidateBrief uses estimated score and preset context', () => {
   assert.match(markdown, /- Score: 3\.92 \/ 5.00/);
   assert.match(markdown, /Imported from OpenClaw autonomy improvements/);
   assert.match(markdown, /- OpenClaw usefulness: 5/);
+});
+
+test('getScoreProfile returns the demo-first profile', () => {
+  const profile = getScoreProfile('demo-first');
+  assert.equal(profile.label, 'Demo first');
+  assert.equal(profile.rubric.find((item) => item.key === 'demo')?.weight, 0.35);
+});
+
+test('rankCandidates uses the selected score profile', () => {
+  const candidates = [
+    { title: 'Build flashy preview', section: 'Public micro-project experiments', note: 'Imported from Public micro-project experiments' },
+    { title: 'Improve internal recorder', section: 'OpenClaw autonomy improvements', note: 'Imported from OpenClaw autonomy improvements' }
+  ];
+
+  const balanced = rankCandidates(candidates, getScoreProfile('balanced').rubric);
+  const demoFirst = rankCandidates(candidates, getScoreProfile('demo-first').rubric);
+
+  assert.notDeepEqual(
+    balanced.map((item) => item.title),
+    demoFirst.map((item) => item.title)
+  );
+  assert.equal(demoFirst[0].title, 'Build flashy preview');
+});
+
+test('scoreProfiles expose the UI-ready labels in stable order', () => {
+  assert.deepEqual(scoreProfiles.map((profile) => profile.label), [
+    'Balanced',
+    'Demo first',
+    'Autonomy first'
+  ]);
 });

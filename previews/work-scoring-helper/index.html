@@ -64,7 +64,7 @@
     label { font-weight: 700; }
     small, .hint { color: var(--muted); }
     input[type="range"] { width: 100%; margin-top: 12px; }
-    input[type="text"], textarea {
+    input[type="text"], textarea, select {
       width: 100%;
       background: #08111d;
       color: var(--text);
@@ -235,7 +235,12 @@
         <div class="badge">Weighted score</div>
         <div class="score" id="score">0.0</div>
         <p id="summary" class="topline">Adjust the sliders to see whether this work is a strong next-cycle candidate.</p>
-        <div class="hint">Weights reflect the lab default: novelty 20%, feasibility 25%, demo value 20%, OpenClaw usefulness 20%, compounding autonomy value 15%.</div>
+        <div>
+          <label for="profileSelect">Scenario profile</label>
+          <select id="profileSelect"></select>
+          <p id="profileHint" class="hint">Balanced: use the lab default weighting.</p>
+        </div>
+        <div class="hint">Scenario profiles change the weight mix for both the score summary and ranked backlog candidates.</div>
         <div class="toolbar">
           <button id="exportBtn" class="secondary" type="button">Export saved ideas</button>
           <label for="importFile" class="ghost">Import saved ideas</label>
@@ -252,8 +257,10 @@
       defaultRubric,
       findPreset,
       formatIdeaBrief,
+      getScoreProfile,
       parseBacklog,
       rankCandidates,
+      scoreProfiles,
       scoreValues
     } from './scoring.js';
 
@@ -277,6 +284,9 @@
     const candidateSummaryEl = document.getElementById('candidateSummary');
     const transferStatusEl = document.getElementById('transferStatus');
     const presetHintEl = document.getElementById('presetHint');
+    const profileSelectEl = document.getElementById('profileSelect');
+    const profileHintEl = document.getElementById('profileHint');
+    let activeProfile = getScoreProfile('balanced');
 
     function recommendation(score) {
       if (score >= 4.2) return 'Excellent candidate. This is strong cycle material.';
@@ -287,7 +297,7 @@
 
     function computeScore() {
       const values = Object.fromEntries(rubric.map((item) => [item.key, item.value]));
-      const total = scoreValues(values, rubric);
+      const total = scoreValues(values, activeProfile.rubric);
       scoreEl.textContent = total.toFixed(2);
       summaryEl.textContent = recommendation(total);
       return total;
@@ -302,7 +312,7 @@
           <div class="row">
             <div>
               <label for="${item.key}">${item.label}</label><br>
-              <small>Weight ${(item.weight * 100).toFixed(0)}%</small>
+              <small>Weight ${((activeProfile.rubric.find((profileItem) => profileItem.key === item.key)?.weight ?? item.weight) * 100).toFixed(0)}%</small>
             </div>
             <strong id="${item.key}-value">${item.value}</strong>
           </div>
@@ -380,7 +390,7 @@
     }
 
     async function copyCandidateBrief(candidate) {
-      const markdown = buildCandidateBrief(candidate, rubric, new Date().toISOString());
+      const markdown = buildCandidateBrief(candidate, activeProfile.rubric, new Date().toISOString());
       await copyText(markdown);
       setTransferStatus(`Copied markdown brief for ${candidate.title}.`);
     }
@@ -423,7 +433,7 @@
     }
 
     function renderCandidates() {
-      const items = rankCandidates(loadCandidates(), rubric);
+      const items = rankCandidates(loadCandidates(), activeProfile.rubric);
       candidateListEl.innerHTML = '';
 
       if (!items.length) {
@@ -433,7 +443,7 @@
       }
 
       const top = items[0];
-      candidateSummaryEl.textContent = `Top preset-ranked candidate: ${top.title} (${top.estimatedScore.toFixed(2)}).`;
+      candidateSummaryEl.textContent = `Top ${activeProfile.label.toLowerCase()} candidate: ${top.title} (${top.estimatedScore.toFixed(2)}).`;
 
       items.forEach((candidate, index) => {
         const card = document.createElement('div');
@@ -446,7 +456,7 @@
             </div>
             <div class="candidate-score">
               <strong>${candidate.estimatedScore.toFixed(2)}</strong>
-              <small>${candidate.preset ? candidate.preset.label : 'Current sliders'}</small>
+              <small>${activeProfile.label} • ${candidate.preset ? candidate.preset.label : 'Current sliders'}</small>
             </div>
           </div>
           <p>${candidate.note}</p>
@@ -518,13 +528,32 @@
       }
     }
 
+    function renderProfileOptions() {
+      profileSelectEl.innerHTML = scoreProfiles.map((profile) => `<option value="${profile.id}">${profile.label}</option>`).join('');
+      profileSelectEl.value = activeProfile.id;
+      profileHintEl.textContent = `${activeProfile.label}: ${activeProfile.description}`;
+    }
+
+    function setActiveProfile(profileId) {
+      activeProfile = getScoreProfile(profileId);
+      profileSelectEl.value = activeProfile.id;
+      profileHintEl.textContent = `${activeProfile.label}: ${activeProfile.description}`;
+      computeScore();
+      renderCriteria();
+      renderCandidates();
+    }
+
+    profileSelectEl.addEventListener('change', (event) => {
+      setActiveProfile(event.target.value);
+    });
+
     document.getElementById('saveBtn').addEventListener('click', () => {
       const title = ideaEl.value.trim() || 'Untitled idea';
       const score = computeScore();
       const items = loadSaved();
       items.push({
         title,
-        section: 'Manual scoring',
+        section: `Manual scoring (${activeProfile.label})`,
         notes: notesEl.value.trim(),
         score,
         breakdown: rubric.map((item) => ({ label: item.label, value: item.value })),
@@ -568,9 +597,9 @@
       event.target.value = '';
     });
 
-    renderCriteria();
+    renderProfileOptions();
+    setActiveProfile('balanced');
     renderSaved();
-    renderCandidates();
   </script>
 </body>
 </html>

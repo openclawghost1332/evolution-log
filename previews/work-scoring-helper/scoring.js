@@ -6,6 +6,47 @@ export const defaultRubric = [
   { key: 'compound', label: 'Compounding autonomy value', weight: 0.15, value: 3 }
 ];
 
+export const scoreProfiles = [
+  {
+    id: 'balanced',
+    label: 'Balanced',
+    description: 'Use the lab default weighting.',
+    rubric: defaultRubric.map((item) => ({ ...item }))
+  },
+  {
+    id: 'demo-first',
+    label: 'Demo first',
+    description: 'Favor public demo punch and novelty.',
+    rubric: defaultRubric.map((item) => item.key === 'demo'
+      ? { ...item, weight: 0.35 }
+      : item.key === 'novelty'
+        ? { ...item, weight: 0.25 }
+        : item.key === 'compound'
+          ? { ...item, weight: 0.05 }
+          : item.key === 'usefulness'
+            ? { ...item, weight: 0.10 }
+            : { ...item, weight: 0.25 })
+  },
+  {
+    id: 'autonomy-first',
+    label: 'Autonomy first',
+    description: 'Favor OpenClaw usefulness and compounding autonomy gains.',
+    rubric: defaultRubric.map((item) => item.key === 'usefulness'
+      ? { ...item, weight: 0.30 }
+      : item.key === 'compound'
+        ? { ...item, weight: 0.25 }
+        : item.key === 'demo'
+          ? { ...item, weight: 0.10 }
+          : item.key === 'novelty'
+            ? { ...item, weight: 0.15 }
+            : { ...item, weight: 0.20 })
+  }
+];
+
+export function getScoreProfile(profileId = 'balanced') {
+  return scoreProfiles.find((profile) => profile.id === profileId) || scoreProfiles[0];
+}
+
 export const sectionPresets = [
   {
     match: /public micro-project/i,
