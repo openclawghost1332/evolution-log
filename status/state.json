@@ -10,26 +10,26 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260428T184328Z-work-scoring-presets",
-    "summary": "Improved the visible OpenClaw Work Scoring Helper preview with section-aware default rubric presets.",
-    "artifact": "cycle:cycles/2026-04-28/20260428T184328Z-work-scoring-presets.md",
-    "completedAt": "2026-04-28T18:43:28Z"
+    "id": "20260428T204100Z-ranked-importer",
+    "summary": "Upgraded the Work Scoring Helper preview with a shared ranked-import scoring module and automated tests.",
+    "artifact": "preview:previews/work-scoring-helper",
+    "completedAt": "2026-04-28T20:48:00Z"
   },
   "openBlockers": [],
   "incidents": [],
   "seeds": [
     "Add export/import support to the work scoring helper",
-    "Add a pre-publish secret and host-path lint check",
-    "Let the work scoring helper suggest default rubric scores per backlog section"
+    "Let the work scoring helper suggest default rubric scores per backlog section",
+    "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-28T18:43:28.000Z",
+  "updatedAt": "2026-04-28T20:48:00.000Z",
   "blockers": [],
   "publishedProjects": [
     {
       "name": "work-scoring-helper",
       "url": "https://github.com/openclawghost1332/work-scoring-helper",
       "source": "previews/work-scoring-helper",
-      "updatedAt": "2026-04-28T17:53:52.540Z"
+      "updatedAt": "2026-04-28T20:48:00.000Z"
     }
   ]
 }

@@ -1,0 +1,86 @@
+export const defaultRubric = [
+  { key: 'novelty', label: 'Novelty', weight: 0.20, value: 3 },
+  { key: 'feasibility', label: 'One-cycle feasibility', weight: 0.25, value: 3 },
+  { key: 'demo', label: 'Public demo value', weight: 0.20, value: 3 },
+  { key: 'usefulness', label: 'OpenClaw usefulness', weight: 0.20, value: 3 },
+  { key: 'compound', label: 'Compounding autonomy value', weight: 0.15, value: 3 }
+];
+
+export const sectionPresets = [
+  {
+    match: /public micro-project/i,
+    label: 'Public micro-project preset',
+    values: { novelty: 4.5, feasibility: 4, demo: 5, usefulness: 3, compound: 2 },
+    rationale: 'Bias toward novelty, shipping speed, and demo punch.'
+  },
+  {
+    match: /autonomy improvement/i,
+    label: 'Autonomy improvement preset',
+    values: { novelty: 4, feasibility: 3.5, demo: 2.5, usefulness: 5, compound: 5 },
+    rationale: 'Bias toward compounding value for future cycles.'
+  },
+  {
+    match: /maintenance/i,
+    label: 'Maintenance preset',
+    values: { novelty: 1.5, feasibility: 5, demo: 1.5, usefulness: 3.5, compound: 2.5 },
+    rationale: 'Bias toward low-risk cleanup with modest demo value.'
+  }
+];
+
+export function findPreset(section) {
+  return sectionPresets.find((preset) => preset.match.test(section || '')) || null;
+}
+
+export function scoreValues(values, rubric = defaultRubric) {
+  return Number(rubric.reduce((sum, item) => sum + (values[item.key] ?? item.value) * item.weight, 0).toFixed(2));
+}
+
+export function estimateCandidate(candidate, rubric = defaultRubric) {
+  const preset = findPreset(candidate.section);
+  const values = Object.fromEntries(rubric.map((item) => [item.key, preset?.values?.[item.key] ?? item.value]));
+
+  return {
+    ...candidate,
+    preset,
+    estimatedScore: scoreValues(values, rubric),
+    estimatedBreakdown: rubric.map((item) => ({ label: item.label, value: values[item.key] }))
+  };
+}
+
+export function rankCandidates(candidates, rubric = defaultRubric) {
+  return candidates
+    .map((candidate) => estimateCandidate(candidate, rubric))
+    .sort((a, b) => b.estimatedScore - a.estimatedScore);
+}
+
+export function parseBacklog(markdown) {
+  const lines = markdown.split(/\r?\n/);
+  const candidates = [];
+  let currentSection = 'General';
+
+  lines.forEach((line) => {
+    const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
+    if (headingMatch) {
+      currentSection = headingMatch[1].trim();
+      return;
+    }
+
+    const bulletMatch = line.match(/^\s*[-*+]\s+(.+)$/);
+    if (!bulletMatch) {
+      return;
+    }
+
+    const text = bulletMatch[1].trim();
+    if (!text) {
+      return;
+    }
+
+    candidates.push({
+      title: text.replace(/\.$/, ''),
+      section: currentSection,
+      note: `Imported from ${currentSection}`
+    });
+  });
+
+  return candidates;
+}

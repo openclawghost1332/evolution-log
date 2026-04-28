@@ -154,6 +154,29 @@
       padding-right: 4px;
     }
     .candidate-card p { margin-bottom: 0; }
+    .candidate-score {
+      min-width: 96px;
+      text-align: right;
+    }
+    .candidate-score strong {
+      display: block;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+    .candidate-score small {
+      display: block;
+      margin-top: 4px;
+    }
+    .candidate-tools {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .winner {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(119, 224, 165, 0.25);
+    }
     .empty {
       border: 1px dashed var(--line);
       border-radius: 14px;
@@ -170,7 +193,7 @@
 <body>
   <div class="wrap">
     <h1>OpenClaw Work Scoring Helper</h1>
-    <p>Score candidate ideas using the Evolution Lab rubric, then paste backlog markdown to turn `NEXT.md` bullets into one-click candidates. It is a fast way to go from backlog to ship decision.</p>
+    <p>Score candidate ideas using the Evolution Lab rubric, then paste backlog markdown to turn `NEXT.md` bullets into ranked candidates. It is a fast way to go from backlog to ship decision.</p>
     <div class="grid">
       <section class="stack">
         <div class="panel controls">
@@ -194,7 +217,7 @@
           <div class="row">
             <div>
               <h2>Backlog importer</h2>
-              <p>Paste markdown from `NEXT.md` or any backlog. Bullet items become candidates grouped by the nearest heading.</p>
+              <p>Paste markdown from `NEXT.md` or any backlog. Bullet items become ranked candidates grouped by the nearest heading and scored with section-aware presets.</p>
             </div>
             <button id="seedBtn" class="ghost">Load sample</button>
           </div>
@@ -203,6 +226,7 @@
             <button id="parseBtn">Parse backlog</button>
             <button id="clearBacklogBtn" class="secondary">Clear parsed candidates</button>
           </div>
+          <p id="candidateSummary" class="hint">No parsed candidates yet.</p>
           <div id="candidateList" class="candidate-list"></div>
         </div>
       </section>
@@ -222,37 +246,17 @@
       </aside>
     </div>
   </div>
-  <script>
-    const rubric = [
-      { key: 'novelty', label: 'Novelty', weight: 0.20, value: 3 },
-      { key: 'feasibility', label: 'One-cycle feasibility', weight: 0.25, value: 3 },
-      { key: 'demo', label: 'Public demo value', weight: 0.20, value: 3 },
-      { key: 'usefulness', label: 'OpenClaw usefulness', weight: 0.20, value: 3 },
-      { key: 'compound', label: 'Compounding autonomy value', weight: 0.15, value: 3 }
-    ];
+  <script type="module">
+    import { defaultRubric, findPreset, parseBacklog, rankCandidates, scoreValues } from './scoring.js';
 
-    const sampleBacklog = `## Public micro-project experiments\n- Build a tiny browser tool that solves one concrete developer workflow pain.\n- Publish a minimal static demo with source, README, and a screenshot or preview.\n\n## OpenClaw autonomy improvements\n- Improve cycle recording so artifacts, blockers, and previews are easier to audit.\n- Prototype a better work scoring helper for novelty, feasibility, demo value, OpenClaw usefulness, and compounding autonomy value.`;
+    const rubric = defaultRubric.map((item) => ({ ...item }));
+    const sampleBacklog = `## Public micro-project experiments
+- Build a tiny browser tool that solves one concrete developer workflow pain.
+- Publish a minimal static demo with source, README, and a screenshot or preview.
 
-    const sectionPresets = [
-      {
-        match: /public micro-project/i,
-        label: 'Public micro-project preset',
-        values: { novelty: 4.5, feasibility: 4, demo: 5, usefulness: 3, compound: 2.5 },
-        rationale: 'Bias toward novelty, shipping speed, and demo punch.'
-      },
-      {
-        match: /autonomy improvement/i,
-        label: 'Autonomy improvement preset',
-        values: { novelty: 3.5, feasibility: 3.5, demo: 2.5, usefulness: 5, compound: 5 },
-        rationale: 'Bias toward compounding value for future cycles.'
-      },
-      {
-        match: /maintenance/i,
-        label: 'Maintenance preset',
-        values: { novelty: 1.5, feasibility: 5, demo: 1.5, usefulness: 3.5, compound: 2.5 },
-        rationale: 'Bias toward low-risk cleanup with modest demo value.'
-      }
-    ];
+## OpenClaw autonomy improvements
+- Improve cycle recording so artifacts, blockers, and previews are easier to audit.
+- Prototype a better work scoring helper for novelty, feasibility, demo value, OpenClaw usefulness, and compounding autonomy value.`;
 
     const criteriaEl = document.getElementById('criteria');
     const scoreEl = document.getElementById('score');
@@ -262,6 +266,7 @@
     const notesEl = document.getElementById('notes');
     const backlogInputEl = document.getElementById('backlogInput');
     const candidateListEl = document.getElementById('candidateList');
+    const candidateSummaryEl = document.getElementById('candidateSummary');
     const transferStatusEl = document.getElementById('transferStatus');
     const presetHintEl = document.getElementById('presetHint');
 
@@ -273,7 +278,8 @@
     }
 
     function computeScore() {
-      const total = rubric.reduce((sum, item) => sum + item.value * item.weight, 0);
+      const values = Object.fromEntries(rubric.map((item) => [item.key, item.value]));
+      const total = scoreValues(values, rubric);
       scoreEl.textContent = total.toFixed(2);
       summaryEl.textContent = recommendation(total);
       return total;
@@ -304,10 +310,6 @@
         });
       });
       computeScore();
-    }
-
-    function findPreset(section) {
-      return sectionPresets.find((preset) => preset.match.test(section || '')) || null;
     }
 
     function applyPreset(preset) {
@@ -348,38 +350,11 @@
           <p>${item.notes || 'No note added.'}</p>
           <div class="idea-meta">
             <span>${new Date(item.savedAt).toLocaleString()}</span>
-            <span>${item.breakdown.map(part => `${part.label}: ${part.value}`).join(' • ')}</span>
+            <span>${item.breakdown.map((part) => `${part.label}: ${part.value}`).join(' • ')}</span>
           </div>
         `;
         savedIdeasEl.appendChild(card);
       });
-    }
-
-    function parseBacklog(markdown) {
-      const lines = markdown.split(/\r?\n/);
-      const candidates = [];
-      let currentSection = 'General';
-
-      lines.forEach((line) => {
-        const headingMatch = line.match(/^#{1,6}\s+(.+)$/);
-        if (headingMatch) {
-          currentSection = headingMatch[1].trim();
-          return;
-        }
-
-        const bulletMatch = line.match(/^\s*[-*+]\s+(.+)$/);
-        if (bulletMatch) {
-          const text = bulletMatch[1].trim();
-          if (!text) return;
-          candidates.push({
-            title: text.replace(/\.$/, ''),
-            section: currentSection,
-            note: `Imported from ${currentSection}`
-          });
-        }
-      });
-
-      return candidates;
     }
 
     function useCandidate(candidate) {
@@ -391,26 +366,36 @@
     }
 
     function renderCandidates() {
-      const items = loadCandidates();
+      const items = rankCandidates(loadCandidates(), rubric);
       candidateListEl.innerHTML = '';
 
       if (!items.length) {
+        candidateSummaryEl.textContent = 'No parsed candidates yet.';
         candidateListEl.innerHTML = '<div class="empty">No parsed candidates yet. Paste backlog markdown and click <strong>Parse backlog</strong>.</div>';
         return;
       }
 
+      const top = items[0];
+      candidateSummaryEl.textContent = `Top preset-ranked candidate: ${top.title} (${top.estimatedScore.toFixed(2)}).`;
+
       items.forEach((candidate, index) => {
         const card = document.createElement('div');
-        card.className = 'candidate-card';
+        card.className = `candidate-card${index === 0 ? ' winner' : ''}`;
         card.innerHTML = `
           <div class="candidate-head">
             <div>
               <h3>${index + 1}. ${candidate.title}</h3>
               <div class="candidate-meta"><span class="tag">${candidate.section}</span></div>
             </div>
-            <button class="ghost" type="button">Use in scorer</button>
+            <div class="candidate-score">
+              <strong>${candidate.estimatedScore.toFixed(2)}</strong>
+              <small>${candidate.preset ? candidate.preset.label : 'Current sliders'}</small>
+            </div>
           </div>
           <p>${candidate.note}</p>
+          <div class="candidate-tools">
+            <button class="ghost" type="button">Use in scorer</button>
+          </div>
         `;
         card.querySelector('button').addEventListener('click', () => useCandidate(candidate));
         candidateListEl.appendChild(card);
@@ -450,7 +435,7 @@
         if (!Array.isArray(ideas)) throw new Error('JSON must contain an ideas array.');
 
         const normalized = ideas
-          .filter(item => item && typeof item === 'object')
+          .filter((item) => item && typeof item === 'object')
           .map((item) => ({
             title: typeof item.title === 'string' && item.title.trim() ? item.title.trim() : 'Untitled idea',
             notes: typeof item.notes === 'string' ? item.notes : '',
@@ -475,7 +460,7 @@
         title,
         notes: notesEl.value.trim(),
         score,
-        breakdown: rubric.map(item => ({ label: item.label, value: item.value })),
+        breakdown: rubric.map((item) => ({ label: item.label, value: item.value })),
         savedAt: new Date().toISOString()
       });
       saveSaved(items);
@@ -483,7 +468,9 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
-      rubric.forEach(item => item.value = 3);
+      defaultRubric.forEach((item, index) => {
+        rubric[index].value = item.value;
+      });
       renderCriteria();
       presetHintEl.textContent = 'Use the scorer manually, or pick a backlog candidate to apply a section-aware preset.';
     });
