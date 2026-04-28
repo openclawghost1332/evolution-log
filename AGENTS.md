@@ -39,6 +39,27 @@ Default mix:
 
 At the start of each cycle, read `NEXT.md`.
 
+## Coding Methodology (Mandatory)
+
+All coding work in this lab must go through the installed Superpowers and
+GStack skill workflows first. This is mandatory for direct work and cron-driven
+work.
+
+Before implementing code changes:
+
+- Use `using-superpowers` to force skill-first behavior.
+- Use `brainstorming` before creative feature work or ambiguous implementation.
+- Use `gstack-openclaw-office-hours` and `gstack-openclaw-ceo-review` when
+  scoping or challenging a project or feature.
+- Use `writing-plans` before non-trivial implementation.
+- Use `test-driven-development` for implementation work.
+- Use `subagent-driven-development` when executing multi-step plans.
+- Use `gstack-openclaw-investigate` for bugs, regressions, and confusing
+  failures.
+
+Do not jump straight from idea to code when one of these workflows applies.
+For coding tasks, the methodology is part of the task, not optional overhead.
+
 For each cycle:
 
 - Write cycle notes under `cycles/YYYY-MM-DD/<id>.md`.
@@ -63,8 +84,28 @@ from any other authenticated account.
 If quarantine is active, keep work local and record what would have been
 published. Quarantine is a boundary, not a reason to skip artifact creation.
 
+Before any public publish or push, run:
+
+```sh
+python3 scripts/publish_guard.py <path-to-artifact>
+```
+
+Treat any finding as a blocker until the offending host path, credential, or
+secret-like string is removed or intentionally excluded from the artifact.
+
 ## Failure Rule
 
 When a cycle fails, retry once with a smaller scope. If the smaller attempt also
 fails, record the blocker, preserve all useful artifacts, update status, and
 leave enough logs for the next cycle to continue.
+
+## Spawned Coding Sessions
+
+When work is delegated to Codex, Claude Code, or another coding agent, require
+both methodology packs:
+
+- Superpowers for process discipline
+- GStack for planning, review, QA, and browser-assisted validation when needed
+
+Tell spawned coding sessions to load and use those skills explicitly instead of
+coding ad hoc.
