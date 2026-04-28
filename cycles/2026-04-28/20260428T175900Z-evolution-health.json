@@ -39,9 +39,9 @@
       "ok": true,
       "command": "gh auth status",
       "exitCode": 0,
-      "account": "nikolafilip",
+      "account": "openclawghost1332",
       "matchesConfiguredUser": true,
-      "configuredUser": "nikolafilip"
+      "configuredUser": "openclawghost1332"
     },
     "latestCycle": {
       "id": "20260428T174700Z-evolution-health",

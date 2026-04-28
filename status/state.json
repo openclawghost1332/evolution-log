@@ -5,8 +5,8 @@
   "focus": "hybrid",
   "github": {
     "org": "",
-    "user": "nikolafilip",
-    "evolutionLog": "https://github.com/nikolafilip/evolution-log"
+    "user": "openclawghost1332",
+    "evolutionLog": "https://github.com/openclawghost1332/evolution-log"
   },
   "currentCycle": null,
   "lastCompletedCycle": {
@@ -22,12 +22,12 @@
     "Add a pre-publish secret and host-path lint check",
     "Let the work scoring helper suggest default rubric scores per backlog section"
   ],
-  "updatedAt": "2026-04-28T18:14:00.000Z",
+  "updatedAt": "2026-04-28T18:22:30.000Z",
   "blockers": [],
   "publishedProjects": [
     {
       "name": "work-scoring-helper",
-      "url": "https://github.com/nikolafilip/work-scoring-helper",
+      "url": "https://github.com/openclawghost1332/work-scoring-helper",
       "source": "previews/work-scoring-helper",
       "updatedAt": "2026-04-28T17:53:52.540Z"
     }

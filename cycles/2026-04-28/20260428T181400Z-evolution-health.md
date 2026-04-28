@@ -23,7 +23,7 @@ The lab needs a durable operational check that records stale-cycle, preview, or 
 - Status dashboard state is readable and the status service reports healthy.
 - Preview registry contains the `work-scoring-helper` entry and its preview URL returns HTTP 200.
 - Latest completed cycle `20260428T175900Z-evolution-health` was 15 minutes old at check time, so cycle freshness is healthy and not stale.
-- GitHub CLI is authenticated as `nikolafilip`, matching the configured `github.user` value in `status/state.json`.
+- GitHub CLI is authenticated for the configured lab account.
 - `github.org` is empty, but this is not a publishing blocker because `github.user` is configured.
 
 ## Incidents
