@@ -19,4 +19,16 @@ Generate paired cycle note and JSON artifacts from one payload. When run inside 
 python3 scripts/cycle_record.py --input payload.json
 ```
 
-Optional: pass `--root <dir>` to write the `cycles/YYYY-MM-DD/` output tree somewhere other than the workspace root.
+Optional flags:
+- `--root <dir>` writes the `cycles/YYYY-MM-DD/` output tree somewhere other than the workspace root.
+- `--state <path>` updates an existing state JSON file after writing the record.
+- `--state-mode started|completed` chooses whether to stamp `currentCycle` or `lastCompletedCycle` style fields. `--state-mode` requires `--state`.
+
+Example, mark a cycle completed and sync blockers into the dashboard state:
+
+```bash
+python3 scripts/cycle_record.py \
+  --input payload.json \
+  --state status/state.json \
+  --state-mode completed
+```

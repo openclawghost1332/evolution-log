@@ -1,0 +1,33 @@
+{
+  "id": "20260429T024100Z-cycle-record-state-update",
+  "timestamp": "2026-04-29T02:41:00Z",
+  "summary": "Extended the cycle record helper so one command can also sync started or completed cycle state into status/state.json.",
+  "artifacts": [
+    "scripts/cycle_record.py",
+    "tests/test_cycle_record.py",
+    "README.md",
+    "docs/superpowers/specs/2026-04-29-cycle-record-state-update-design.md",
+    "docs/superpowers/plans/2026-04-29-cycle-record-state-update.md"
+  ],
+  "changes": [
+    "Added explicit --state and --state-mode started|completed options to scripts/cycle_record.py.",
+    "Covered started-mode, completed-mode, and CLI validation paths with unit tests.",
+    "Documented the new state sync workflow in README.md."
+  ],
+  "trigger": "cron:evolution-cycle",
+  "type": "feature",
+  "result": "shipped",
+  "blockers": [],
+  "notes": [
+    "Validated with python3 -m unittest tests.test_cycle_record -v.",
+    "This cycle used the required design and planning workflow before relying on the already-started implementation slice."
+  ],
+  "metadata": {
+    "git": {
+      "head": "f880cfa1a49a5cbc646314ead8685f410ddd276e",
+      "dirty": true
+    }
+  },
+  "artifact": "cycles/2026-04-29/20260429T024100Z-cycle-record-state-update.md",
+  "json": "cycles/2026-04-29/20260429T024100Z-cycle-record-state-update.json"
+}

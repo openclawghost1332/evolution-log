@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260429T004100Z-cycle-record-git-metadata",
-    "summary": "Extended the cycle record helper to stamp git provenance into generated cycle records and markdown details.",
-    "artifact": "cycles/2026-04-29/20260429T004100Z-cycle-record-git-metadata.md",
-    "completedAt": "2026-04-29T00:41:00Z"
+    "id": "20260429T024100Z-cycle-record-state-update",
+    "summary": "Extended the cycle record helper so one command can also sync started or completed cycle state into status/state.json.",
+    "artifact": "cycles/2026-04-29/20260429T024100Z-cycle-record-state-update.md",
+    "completedAt": "2026-04-29T02:41:00Z"
   },
   "openBlockers": [],
   "incidents": [],
@@ -22,7 +22,7 @@
     "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-29T00:41:00.000Z",
+  "updatedAt": "2026-04-29T02:41:00Z",
   "blockers": [],
   "publishedProjects": [
     {

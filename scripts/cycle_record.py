@@ -114,7 +114,47 @@ def _render_markdown(payload: dict[str, Any], artifact_path: str, json_path: str
     )
 
 
-def write_cycle_record(payload: dict[str, Any], root: Path) -> dict[str, str]:
+def _update_state_file(
+    payload: dict[str, Any],
+    root: Path,
+    state_path: Path,
+    state_mode: str,
+    artifact_path: Path,
+) -> None:
+    resolved_state_path = state_path if state_path.is_absolute() else root / state_path
+    state = json.loads(resolved_state_path.read_text(encoding="utf-8"))
+    timestamp = payload["timestamp"].strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    if state_mode == "started":
+        state["currentCycle"] = {
+            "id": payload["id"],
+            "summary": payload["summary"],
+            "artifact": artifact_path.as_posix(),
+            "startedAt": timestamp,
+        }
+    elif state_mode == "completed":
+        state["lastCompletedCycle"] = {
+            "id": payload["id"],
+            "summary": payload["summary"],
+            "artifact": artifact_path.as_posix(),
+            "completedAt": timestamp,
+        }
+        state["currentCycle"] = None
+        state["openBlockers"] = payload["blockers"]
+    else:
+        raise ValueError(f"Unsupported state mode: {state_mode}")
+
+    state["updatedAt"] = timestamp
+    resolved_state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+
+def write_cycle_record(
+    payload: dict[str, Any],
+    root: Path,
+    state_path: Path | None = None,
+    state_mode: str | None = None,
+) -> dict[str, str]:
     normalized = _validate_payload(payload)
     normalized["metadata"] = {
         **normalized["metadata"],
@@ -148,6 +188,8 @@ def write_cycle_record(payload: dict[str, Any], root: Path) -> dict[str, str]:
         encoding="utf-8",
     )
     (root / json_path).write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    if state_path and state_mode:
+        _update_state_file(normalized, root, state_path, state_mode, artifact_path)
     return {"artifact": record["artifact"], "json": record["json"]}
 
 
@@ -155,10 +197,20 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", required=True)
     parser.add_argument("--root", default=".")
+    parser.add_argument("--state")
+    parser.add_argument("--state-mode", choices=("started", "completed"))
     args = parser.parse_args(argv)
 
+    if args.state_mode and not args.state:
+        raise ValueError("--state-mode requires --state")
+
     payload = json.loads(Path(args.input).read_text(encoding="utf-8"))
-    result = write_cycle_record(payload, Path(args.root))
+    result = write_cycle_record(
+        payload,
+        Path(args.root),
+        state_path=Path(args.state) if args.state else None,
+        state_mode=args.state_mode,
+    )
     print(json.dumps(result))
     return 0
 
