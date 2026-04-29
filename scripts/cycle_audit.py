@@ -50,8 +50,46 @@ def _compare_cycle_record(last_completed: dict[str, Any], record: dict[str, Any]
     return issues
 
 
-def audit_workspace(root: Path) -> dict[str, Any]:
+def _repair_preview_registry(root: Path, state: dict[str, Any]) -> int:
+    registry_path = root / "previews" / "registry.json"
+    if not registry_path.exists():
+        return 0
+
+    registry = _read_json(registry_path)
+    previews = registry.get("previews")
+    if not isinstance(previews, list):
+        return 0
+
+    preview_by_path = {
+        preview.get("path"): preview
+        for preview in previews
+        if isinstance(preview, dict) and preview.get("path")
+    }
+
+    repaired = 0
+    for project in state.get("publishedProjects", []):
+        if not isinstance(project, dict):
+            continue
+
+        source = project.get("source")
+        updated_at = project.get("updatedAt")
+        preview = preview_by_path.get(source)
+        if preview and updated_at and preview.get("updatedAt") != updated_at:
+            preview["updatedAt"] = updated_at
+            repaired += 1
+
+    if repaired:
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+
+    return repaired
+
+
+def audit_workspace(root: Path, repair_preview_registry: bool = False) -> dict[str, Any]:
     state = _read_json(root / "status" / "state.json")
+    repaired_preview_count = 0
+    if repair_preview_registry:
+        repaired_preview_count = _repair_preview_registry(root, state)
+
     issues: list[str] = []
     last_completed = state.get("lastCompletedCycle")
     latest_cycle_id = None
@@ -140,14 +178,19 @@ def audit_workspace(root: Path) -> dict[str, Any]:
         "openBlockerCount": len(state.get("openBlockers", [])),
         "previewCount": preview_count,
         "publishedProjectCount": published_project_count,
+        "repairedPreviewCount": repaired_preview_count,
     }
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")
+    parser.add_argument("--repair-preview-registry", action="store_true")
     args = parser.parse_args(argv)
-    report = audit_workspace(Path(args.root))
+    report = audit_workspace(
+        Path(args.root),
+        repair_preview_registry=args.repair_preview_registry,
+    )
     print(json.dumps(report, indent=2))
     return 0 if report["ok"] else 1
 

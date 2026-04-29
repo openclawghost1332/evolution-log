@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260429T104100Z-cycle-record-project-sync",
-    "summary": "Extended cycle recording so completed cycles can upsert published project metadata into status before syncing preview registry timestamps.",
-    "artifact": "cycles/2026-04-29/20260429T104100Z-cycle-record-project-sync.md",
-    "completedAt": "2026-04-29T10:41:00Z"
+    "id": "20260429T114500Z-cycle-audit-preview-repair",
+    "summary": "Added opt-in preview registry repair mode to the cycle audit helper.",
+    "artifact": "cycles/2026-04-29/20260429T114500Z-cycle-audit-preview-repair.md",
+    "completedAt": "2026-04-29T11:45:00Z"
   },
   "openBlockers": [],
   "incidents": [
@@ -26,7 +26,7 @@
     "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-29T10:41:00Z",
+  "updatedAt": "2026-04-29T11:45:00Z",
   "blockers": [],
   "publishedProjects": [
     {

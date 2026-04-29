@@ -322,6 +322,34 @@ class CycleAuditTests(unittest.TestCase):
             report["issues"],
         )
 
+    def test_audit_workspace_repairs_preview_timestamp_drift_when_requested(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            self._write_healthy_cycle_files(root)
+            self._write_healthy_state(root, project_updated_at="2026-04-29T07:45:44Z")
+            self._write_preview_registry(root, updated_at="2026-04-28T22:47:20.000Z")
+
+            report = audit_workspace(root, repair_preview_registry=True)
+            registry = json.loads((root / "previews" / "registry.json").read_text(encoding="utf-8"))
+
+        self.assertTrue(report["ok"])
+        self.assertEqual(report["repairedPreviewCount"], 1)
+        self.assertEqual(registry["previews"][0]["updatedAt"], "2026-04-29T07:45:44Z")
+        self.assertEqual(report["issues"], [])
+
+    def test_audit_workspace_reports_zero_repairs_without_matching_drift(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            self._write_healthy_cycle_files(root)
+            self._write_healthy_state(root)
+            self._write_preview_registry(root)
+
+            report = audit_workspace(root, repair_preview_registry=True)
+
+        self.assertTrue(report["ok"])
+        self.assertEqual(report["repairedPreviewCount"], 0)
+        self.assertEqual(report["issues"], [])
+
     def test_main_prints_json_and_nonzero_exit_on_issues(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

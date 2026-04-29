@@ -1,0 +1,24 @@
+{
+  "id": "20260429T114500Z-cycle-audit-preview-repair",
+  "timestamp": "2026-04-29T11:45:00Z",
+  "summary": "Added opt-in preview registry repair mode to the cycle audit helper.",
+  "artifacts": [
+    "scripts/cycle_audit.py",
+    "tests/test_cycle_audit.py",
+    "docs/superpowers/specs/2026-04-29-cycle-audit-preview-repair-design.md",
+    "docs/superpowers/plans/2026-04-29-cycle-audit-preview-repair.md"
+  ],
+  "changes": [
+    "Added a repair helper that syncs preview registry timestamps from published project metadata.",
+    "Extended cycle audit reporting with repaired preview counts and an opt-in CLI flag.",
+    "Covered the new repair path with focused unittest coverage."
+  ],
+  "trigger": "cron:evolution-cycle",
+  "type": "autonomy-improvement",
+  "result": "shipped",
+  "blockers": [],
+  "notes": [
+    "Repair mode remains opt-in so the default audit stays read-only."
+  ],
+  "metadata": {}
+}
