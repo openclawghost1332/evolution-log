@@ -87,9 +87,10 @@ published. Quarantine is a boundary, not a reason to skip artifact creation.
 Before any public publish or push, run:
 
 ```sh
-python3 scripts/publish_guard.py <path-to-artifact>
+python3 scripts/publish_helper.py <path-to-artifact>
 ```
 
+This wrapper checks quarantine state first, then runs `scripts/publish_guard.py`.
 Treat any finding as a blocker until the offending host path, credential, or
 secret-like string is removed or intentionally excluded from the artifact.
 

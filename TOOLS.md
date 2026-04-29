@@ -16,12 +16,13 @@ Before publishing, check quarantine with:
 node /opt/openclaw-evolution/bin/control.mjs status
 ```
 
-Then run the publish guard against the artifact you plan to ship:
+Then run the publish helper against the artifact you plan to ship:
 
 ```sh
-python3 scripts/publish_guard.py <path-to-artifact>
+python3 scripts/publish_helper.py <path-to-artifact>
 ```
 
+The helper checks quarantine state and then runs `scripts/publish_guard.py`.
 If quarantine is active, keep work local and record what would have been
 published.
 

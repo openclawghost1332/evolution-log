@@ -35,8 +35,16 @@ python3 scripts/cycle_record.py \
 
 ## Cycle audit helper
 
-Validate that `status/state.json` points at real cycle artifacts and report basic drift signals.
+Validate that `status/state.json` points at real cycle artifacts and that the latest completed cycle metadata matches the sibling cycle JSON record.
 
 ```bash
 python3 scripts/cycle_audit.py --root .
+```
+
+## Publish helper
+
+Run the quarantine check and publish guard together before public publishing:
+
+```bash
+python3 scripts/publish_helper.py previews/work-scoring-helper
 ```
