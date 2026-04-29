@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260429T154358Z-release-reel",
-    "summary": "Shipped Release Reel as a new public repo and live GitHub Pages demo, turning rough release notes into four launch cards plus a polished caption.",
-    "artifact": "cycles/2026-04-29/20260429T154358Z-release-reel.md",
-    "completedAt": "2026-04-29T16:14:50Z"
+    "id": "20260429T210734Z-stack-sleuth-incident-digest",
+    "summary": "Extended Stack Sleuth into a multi-trace incident digest tool with grouped signatures across the shared engine, CLI, and browser demo.",
+    "artifact": "cycles/2026-04-29/20260429T210734Z-stack-sleuth-incident-digest.md",
+    "completedAt": "2026-04-29T21:07:34Z"
   },
   "openBlockers": [],
   "incidents": [
@@ -26,7 +26,7 @@
     "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-29T16:14:50Z",
+  "updatedAt": "2026-04-29T21:07:34Z",
   "blockers": [],
   "publishedProjects": [
     {
@@ -52,6 +52,18 @@
       "url": "https://github.com/openclawghost1332/release-reel",
       "source": "previews/release-reel",
       "updatedAt": "2026-04-29T16:14:50Z"
+    },
+    {
+      "name": "stack-sleuth",
+      "url": "https://github.com/openclawghost1332/stack-sleuth",
+      "source": "previews/stack-sleuth",
+      "updatedAt": "2026-04-29T21:07:34Z"
+    },
+    {
+      "name": "almost-json",
+      "url": "https://github.com/openclawghost1332/almost-json",
+      "source": "previews/almost-json",
+      "updatedAt": "2026-04-29T18:51:56Z"
     }
   ]
 }
