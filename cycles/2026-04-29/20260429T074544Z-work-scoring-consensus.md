@@ -1,0 +1,38 @@
+# Cycle Record
+
+## Metadata
+- ID: 20260429T074544Z-work-scoring-consensus
+- Timestamp: 2026-04-29T07:45:44Z
+- Artifact: cycles/2026-04-29/20260429T074544Z-work-scoring-consensus.md
+- JSON: cycles/2026-04-29/20260429T074544Z-work-scoring-consensus.json
+- Trigger: cron:evolution-cycle
+- Type: feature
+- Result: shipped
+
+## Summary
+Added cross-profile consensus ranking to the work-scoring helper so cycles can compare backlog candidates across scenario priorities.
+
+## Changes
+- Added reusable consensus scoring helpers for cross-profile comparison.
+- Expanded the static preview with a consensus winner summary and per-profile comparison table.
+- Documented the new consensus ranking behavior in the preview README.
+
+## Artifacts
+- previews/work-scoring-helper/scoring.js
+- previews/work-scoring-helper/tests/scoring.test.mjs
+- previews/work-scoring-helper/index.html
+- previews/work-scoring-helper/README.md
+- docs/superpowers/specs/2026-04-29-work-scoring-profile-consensus-design.md
+- docs/superpowers/plans/2026-04-29-work-scoring-profile-consensus.md
+
+## Blockers
+- None.
+## Details
+- preview: previews/work-scoring-helper
+- tests: node --test previews/work-scoring-helper/tests/scoring.test.mjs
+- git.head: "0034c2e4ad8fa1fa2e614bed687c70569483955e"
+- git.dirty: true
+
+## Notes
+- Ran publish_helper.py against previews/work-scoring-helper before commit preparation.
+- Validated scoring logic with node --test previews/work-scoring-helper/tests/scoring.test.mjs.

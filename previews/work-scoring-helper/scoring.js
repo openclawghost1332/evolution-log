@@ -94,6 +94,46 @@ export function rankCandidates(candidates, rubric = defaultRubric) {
     .sort((a, b) => b.estimatedScore - a.estimatedScore);
 }
 
+export function summarizeCandidateProfiles(candidate) {
+  const profileScores = scoreProfiles.map((profile) => ({
+    profileId: profile.id,
+    profileLabel: profile.label,
+    score: estimateCandidate(candidate, profile.rubric).estimatedScore
+  }));
+  const averageScore = Number((profileScores.reduce((sum, item) => sum + item.score, 0) / profileScores.length).toFixed(2));
+  const balancedScore = profileScores.find((item) => item.profileId === 'balanced')?.score ?? averageScore;
+
+  return {
+    ...candidate,
+    profileScores,
+    averageScore,
+    balancedScore
+  };
+}
+
+export function rankCandidatesByConsensus(candidates) {
+  const summaries = candidates.map((candidate) => summarizeCandidateProfiles(candidate));
+  const winsByTitle = new Map(summaries.map((candidate) => [candidate.title, 0]));
+
+  scoreProfiles.forEach((profile) => {
+    const bestScore = summaries.reduce((max, candidate) => Math.max(max, candidate.profileScores.find((item) => item.profileId === profile.id)?.score ?? 0), Number.NEGATIVE_INFINITY);
+
+    summaries.forEach((candidate) => {
+      const profileScore = candidate.profileScores.find((item) => item.profileId === profile.id)?.score ?? 0;
+      if (profileScore === bestScore) {
+        winsByTitle.set(candidate.title, (winsByTitle.get(candidate.title) ?? 0) + 1);
+      }
+    });
+  });
+
+  return summaries
+    .map((candidate) => ({
+      ...candidate,
+      profileWinCount: winsByTitle.get(candidate.title) ?? 0
+    }))
+    .sort((a, b) => b.averageScore - a.averageScore || b.profileWinCount - a.profileWinCount || b.balancedScore - a.balancedScore || a.title.localeCompare(b.title));
+}
+
 export function formatIdeaBrief({
   title,
   section,

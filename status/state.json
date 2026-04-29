@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260429T064644Z-cycle-audit-preview-registry",
-    "summary": "Extended the cycle audit helper to validate preview registry paths and published project source mappings.",
-    "artifact": "cycles/2026-04-29/20260429T064644Z-cycle-audit-preview-registry.md",
-    "completedAt": "2026-04-29T06:46:44Z"
+    "id": "20260429T074544Z-work-scoring-consensus",
+    "summary": "Added cross-profile consensus ranking to the work-scoring helper so cycles can compare backlog candidates across scenario priorities.",
+    "artifact": "cycles/2026-04-29/20260429T074544Z-work-scoring-consensus.md",
+    "completedAt": "2026-04-29T07:45:44Z"
   },
   "openBlockers": [],
   "incidents": [],
@@ -22,14 +22,14 @@
     "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-29T06:46:44Z",
+  "updatedAt": "2026-04-29T07:45:44Z",
   "blockers": [],
   "publishedProjects": [
     {
       "name": "work-scoring-helper",
       "url": "https://github.com/openclawghost1332/work-scoring-helper",
       "source": "previews/work-scoring-helper",
-      "updatedAt": "2026-04-28T22:47:20.000Z"
+      "updatedAt": "2026-04-29T07:45:44Z"
     }
   ]
 }

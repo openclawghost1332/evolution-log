@@ -9,7 +9,9 @@ import {
   formatIdeaBrief,
   buildCandidateBrief,
   getScoreProfile,
-  scoreProfiles
+  scoreProfiles,
+  summarizeCandidateProfiles,
+  rankCandidatesByConsensus
 } from '../scoring.js';
 
 test('parseBacklog groups bullets under the nearest heading', () => {
@@ -131,6 +133,40 @@ test('rankCandidates uses the selected score profile', () => {
 
 test('scoreProfiles expose the UI-ready labels in stable order', () => {
   assert.deepEqual(scoreProfiles.map((profile) => profile.label), [
+    'Balanced',
+    'Demo first',
+    'Autonomy first'
+  ]);
+});
+
+test('summarizeCandidateProfiles returns per-profile scores and average score', () => {
+  const summary = summarizeCandidateProfiles({
+    title: 'Improve cycle recording',
+    section: 'OpenClaw autonomy improvements',
+    note: 'Imported from OpenClaw autonomy improvements'
+  });
+
+  assert.equal(summary.profileScores.length, 3);
+  assert.equal(summary.profileScores[0].profileId, 'balanced');
+  assert.equal(typeof summary.averageScore, 'number');
+});
+
+test('rankCandidatesByConsensus orders candidates by average score and profile wins', () => {
+  const ranked = rankCandidatesByConsensus([
+    { title: 'Build flashy preview', section: 'Public micro-project experiments', note: 'Imported from Public micro-project experiments' },
+    { title: 'Improve internal recorder', section: 'OpenClaw autonomy improvements', note: 'Imported from OpenClaw autonomy improvements' }
+  ]);
+
+  assert.equal(ranked[0].title, 'Improve internal recorder');
+  assert.equal(typeof ranked[0].profileWinCount, 'number');
+});
+
+test('rankCandidatesByConsensus returns table-ready profile labels', () => {
+  const ranked = rankCandidatesByConsensus([
+    { title: 'Build flashy preview', section: 'Public micro-project experiments', note: 'Imported from Public micro-project experiments' }
+  ]);
+
+  assert.deepEqual(ranked[0].profileScores.map((item) => item.profileLabel), [
     'Balanced',
     'Demo first',
     'Autonomy first'
