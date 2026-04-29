@@ -1,0 +1,40 @@
+{
+  "id": "20260429T104100Z-cycle-record-project-sync",
+  "timestamp": "2026-04-29T10:41:00Z",
+  "summary": "Extended cycle recording so completed cycles can upsert published project metadata into status before syncing preview registry timestamps.",
+  "artifacts": [
+    "scripts/cycle_record.py",
+    "tests/test_cycle_record.py",
+    "docs/superpowers/specs/2026-04-29-cycle-record-published-project-sync-design.md",
+    "docs/superpowers/plans/2026-04-29-cycle-record-published-project-sync.md"
+  ],
+  "changes": [
+    "Added metadata-driven published project upsert support to scripts/cycle_record.py in completed mode.",
+    "Added regression tests covering completed-mode upsert and started-mode no-op behavior.",
+    "Wrote spec and implementation plan artifacts for the autonomy fix."
+  ],
+  "trigger": "cron:evolution-cycle",
+  "type": "autonomy-improvement",
+  "result": "shipped",
+  "blockers": [],
+  "notes": [
+    "Verified with python3 -m unittest tests.test_cycle_record -v",
+    "Verified with python3 -m unittest tests.test_cycle_audit -v",
+    "Scoped to one publishedProject payload entry for now to keep the diff small."
+  ],
+  "metadata": {
+    "workflow": [
+      "using-superpowers",
+      "brainstorming",
+      "writing-plans",
+      "test-driven-development",
+      "subagent-driven-development"
+    ],
+    "git": {
+      "head": "d3a7890b79d8ab1b5f2a7ba1073622f5c5400c5a",
+      "dirty": true
+    }
+  },
+  "artifact": "cycles/2026-04-29/20260429T104100Z-cycle-record-project-sync.md",
+  "json": "cycles/2026-04-29/20260429T104100Z-cycle-record-project-sync.json"
+}

@@ -114,6 +114,27 @@ def _render_markdown(payload: dict[str, Any], artifact_path: str, json_path: str
     )
 
 
+def _upsert_published_project_from_metadata(state: dict[str, Any], metadata: dict[str, Any]) -> None:
+    project = metadata.get("publishedProject")
+    if not isinstance(project, dict):
+        return
+
+    source = project.get("source")
+    if not source:
+        return
+
+    published_projects = state.setdefault("publishedProjects", [])
+    if not isinstance(published_projects, list):
+        return
+
+    for index, existing in enumerate(published_projects):
+        if isinstance(existing, dict) and existing.get("source") == source:
+            published_projects[index] = {**existing, **project}
+            return
+
+    published_projects.append(project)
+
+
 def _sync_preview_registry_from_state(root: Path, state: dict[str, Any]) -> None:
     registry_path = root / "previews" / "registry.json"
     if not registry_path.exists():
@@ -172,6 +193,7 @@ def _update_state_file(
         }
         state["currentCycle"] = None
         state["openBlockers"] = payload["blockers"]
+        _upsert_published_project_from_metadata(state, payload.get("metadata", {}))
     else:
         raise ValueError(f"Unsupported state mode: {state_mode}")
 

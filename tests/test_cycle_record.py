@@ -269,6 +269,124 @@ class CycleRecordTests(unittest.TestCase):
             "2026-04-29T09:30:00Z",
         )
 
+    def test_write_cycle_record_completed_mode_upserts_published_project_from_metadata(self):
+        payload = {
+            "id": "20260429T104100Z-cycle-record-project-sync",
+            "timestamp": "2026-04-29T10:41:00Z",
+            "summary": "Sync published project metadata during completed cycle recording.",
+            "changes": ["Added published project upsert to cycle record helper."],
+            "artifacts": ["scripts/cycle_record.py", "tests/test_cycle_record.py"],
+            "blockers": [],
+            "metadata": {
+                "publishedProject": {
+                    "name": "work-scoring-helper",
+                    "url": "https://github.com/openclawghost1332/work-scoring-helper",
+                    "source": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T10:41:00Z",
+                }
+            },
+        }
+        initial_state = {
+            "currentCycle": {"id": "in-flight"},
+            "lastCompletedCycle": {"id": "older"},
+            "openBlockers": [],
+            "updatedAt": "2026-04-29T00:00:00Z",
+            "publishedProjects": [
+                {
+                    "name": "work-scoring-helper",
+                    "source": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T09:30:00Z",
+                }
+            ],
+        }
+        initial_registry = {
+            "previews": [
+                {
+                    "slug": "work-scoring-helper",
+                    "path": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T07:45:44Z",
+                    "title": "OpenClaw Work Scoring Helper",
+                }
+            ]
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            state_path = root / "status" / "state.json"
+            registry_path = root / "previews" / "registry.json"
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            registry_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps(initial_state), encoding="utf-8")
+            registry_path.write_text(json.dumps(initial_registry), encoding="utf-8")
+
+            write_cycle_record(payload, root, state_path=Path("status/state.json"), state_mode="completed")
+
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            registry = json.loads(registry_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(
+            state["publishedProjects"][0],
+            {
+                "name": "work-scoring-helper",
+                "url": "https://github.com/openclawghost1332/work-scoring-helper",
+                "source": "previews/work-scoring-helper",
+                "updatedAt": "2026-04-29T10:41:00Z",
+            },
+        )
+        self.assertEqual(registry["previews"][0]["updatedAt"], "2026-04-29T10:41:00Z")
+
+    def test_write_cycle_record_started_mode_does_not_upsert_published_project_from_metadata(self):
+        payload = {
+            "id": "20260429T104100Z-cycle-record-project-sync",
+            "timestamp": "2026-04-29T10:41:00Z",
+            "summary": "Do not mutate published project metadata on cycle start.",
+            "changes": ["Guarded published project sync to completed mode only."],
+            "artifacts": ["scripts/cycle_record.py", "tests/test_cycle_record.py"],
+            "blockers": [],
+            "metadata": {
+                "publishedProject": {
+                    "name": "work-scoring-helper",
+                    "url": "https://github.com/openclawghost1332/work-scoring-helper",
+                    "source": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T10:41:00Z",
+                }
+            },
+        }
+        initial_state = {
+            "currentCycle": None,
+            "lastCompletedCycle": {"id": "older"},
+            "openBlockers": [],
+            "updatedAt": "2026-04-28T00:00:00Z",
+            "publishedProjects": [
+                {
+                    "name": "work-scoring-helper",
+                    "source": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T09:30:00Z",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            state_path = root / "status" / "state.json"
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps(initial_state), encoding="utf-8")
+
+            write_cycle_record(payload, root, state_path=Path("status/state.json"), state_mode="started")
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(state["currentCycle"]["id"], payload["id"])
+        self.assertEqual(
+            state["publishedProjects"],
+            [
+                {
+                    "name": "work-scoring-helper",
+                    "source": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T09:30:00Z",
+                }
+            ],
+        )
+
     def test_write_cycle_record_started_mode_does_not_require_preview_registry(self):
         payload = {
             "id": "20260428T234100Z-cycle-record-helper",
