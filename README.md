@@ -32,3 +32,11 @@ python3 scripts/cycle_record.py \
   --state status/state.json \
   --state-mode completed
 ```
+
+## Cycle audit helper
+
+Validate that `status/state.json` points at real cycle artifacts and report basic drift signals.
+
+```bash
+python3 scripts/cycle_audit.py --root .
+```
