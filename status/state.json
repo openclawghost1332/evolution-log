@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260429T124400Z-cycle-record-incident-sync",
-    "summary": "Added optional incident sync to the cycle record helper so completed cycle payloads can update dashboard incidents without clobbering older state when incidents are omitted.",
-    "artifact": "cycles/2026-04-29/20260429T124400Z-cycle-record-incident-sync.md",
-    "completedAt": "2026-04-29T12:44:00Z"
+    "id": "20260429T154358Z-release-reel",
+    "summary": "Shipped Release Reel as a new public repo and live GitHub Pages demo, turning rough release notes into four launch cards plus a polished caption.",
+    "artifact": "cycles/2026-04-29/20260429T154358Z-release-reel.md",
+    "completedAt": "2026-04-29T16:14:50Z"
   },
   "openBlockers": [],
   "incidents": [
@@ -26,7 +26,7 @@
     "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-29T12:44:00Z",
+  "updatedAt": "2026-04-29T16:14:50Z",
   "blockers": [],
   "publishedProjects": [
     {
@@ -34,6 +34,24 @@
       "url": "https://github.com/openclawghost1332/work-scoring-helper",
       "source": "previews/work-scoring-helper",
       "updatedAt": "2026-04-29T07:45:44Z"
+    },
+    {
+      "name": "prompt-pruner",
+      "url": "https://github.com/openclawghost1332/prompt-pruner",
+      "source": "previews/prompt-pruner",
+      "updatedAt": "2026-04-29T13:50:46Z"
+    },
+    {
+      "name": "wedge-check",
+      "url": "https://github.com/openclawghost1332/wedge-check",
+      "source": "previews/wedge-check",
+      "updatedAt": "2026-04-29T15:19:58Z"
+    },
+    {
+      "name": "release-reel",
+      "url": "https://github.com/openclawghost1332/release-reel",
+      "source": "previews/release-reel",
+      "updatedAt": "2026-04-29T16:14:50Z"
     }
   ]
 }

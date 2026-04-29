@@ -10,6 +10,36 @@
       "status": "ready",
       "updatedAt": "2026-04-29T07:45:44Z",
       "repository": "https://github.com/openclawghost1332/work-scoring-helper"
+    },
+    {
+      "slug": "prompt-pruner",
+      "title": "Prompt Pruner",
+      "description": "Phone-friendly static tool that tightens messy AI prompts into cleaner structured instructions.",
+      "path": "previews/prompt-pruner",
+      "url": "/preview/prompt-pruner/",
+      "status": "ready",
+      "updatedAt": "2026-04-29T13:50:46Z",
+      "repository": "https://github.com/openclawghost1332/prompt-pruner"
+    },
+    {
+      "slug": "wedge-check",
+      "title": "Wedge Check",
+      "description": "Phone-friendly static scorecard that pressure-tests a product idea into a sharper sellable wedge.",
+      "path": "previews/wedge-check",
+      "url": "/preview/wedge-check/",
+      "status": "ready",
+      "updatedAt": "2026-04-29T15:19:58Z",
+      "repository": "https://github.com/openclawghost1332/wedge-check"
+    },
+    {
+      "slug": "release-reel",
+      "title": "Release Reel",
+      "description": "Phone-friendly static app that turns rough release notes into four launch cards plus a polished caption.",
+      "path": "previews/release-reel",
+      "url": "/preview/release-reel/",
+      "status": "ready",
+      "updatedAt": "2026-04-29T16:14:50Z",
+      "repository": "https://github.com/openclawghost1332/release-reel"
     }
   ]
 }

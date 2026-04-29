@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Release Reel</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="layout">
+      <section class="hero">
+        <p class="eyebrow">Release Reel</p>
+        <h1>Turn rough release notes into a launch-ready story.</h1>
+        <p class="lede">Shape four launch cards and a social caption in a few taps.</p>
+      </section>
+
+      <section class="panel">
+        <form data-reel-form class="composer" action="#">
+          <label>
+            Product
+            <input id="product" type="text" value="Release Reel" />
+          </label>
+          <label>
+            Version
+            <input id="version" type="text" value="beta 0.2" />
+          </label>
+          <label>
+            Audience
+            <input id="audience" type="text" value="indie makers sharing product momentum" />
+          </label>
+          <label>
+            CTA
+            <input id="cta" type="text" value="Turn notes into launch slides in minutes" />
+          </label>
+          <label>
+            Theme
+            <select id="theme"></select>
+          </label>
+          <label>
+            Notes
+            <textarea id="notes" rows="8">- Added a swipeable phone preview
+- Sharpened copy for launch captions
+- Made theme switching feel instant</textarea>
+          </label>
+
+          <div class="actions">
+            <button type="button" data-build>Build deck</button>
+            <button type="button" data-copy>Copy caption</button>
+          </div>
+
+          <div class="examples">
+            <button type="button" data-load="Rough notes">Load rough notes</button>
+            <button type="button" data-load="Sharp update">Load sharp update</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="preview-shell">
+        <div class="phone-frame">
+          <article class="preview" data-preview data-theme="Midnight">
+            <div class="card-stack">
+              <section class="card">
+                <h2 data-card-title="0">Release Reel beta 0.2</h2>
+                <p data-card-body="0">Built for indie makers sharing product momentum.</p>
+              </section>
+              <section class="card">
+                <h2 data-card-title="1">What changed</h2>
+                <p data-card-body="1">Added a swipeable phone preview</p>
+              </section>
+              <section class="card">
+                <h2 data-card-title="2">Why it matters</h2>
+                <p data-card-body="2">Less friction, more momentum.</p>
+              </section>
+              <section class="card">
+                <h2 data-card-title="3">Ready to try it?</h2>
+                <p data-card-body="3">Turn notes into launch slides in minutes</p>
+              </section>
+            </div>
+            <footer class="caption-box">
+              <strong>Caption</strong>
+              <p data-caption>Release Reel beta 0.2 for indie makers sharing product momentum. Turn notes into launch slides in minutes.</p>
+            </footer>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
