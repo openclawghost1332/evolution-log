@@ -15,6 +15,9 @@ def _validate_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
     normalized = dict(payload)
     normalized["timestamp"] = _parse_timestamp(payload["timestamp"])
+    normalized["incidentsProvided"] = "incidents" in payload
+    if normalized["incidentsProvided"]:
+        normalized["incidents"] = list(payload["incidents"])
     normalized.setdefault("trigger", None)
     normalized.setdefault("type", None)
     normalized.setdefault("result", None)
@@ -90,6 +93,10 @@ def _render_markdown(payload: dict[str, Any], artifact_path: str, json_path: str
         if payload.get(key):
             metadata.append(f"- {key.capitalize()}: {payload[key]}")
 
+    incidents_section = ""
+    if payload.get("incidentsProvided"):
+        incidents_section = f"\n\n## Incidents\n{_render_list(payload.get('incidents', []))}"
+
     notes_section = ""
     if payload.get("notes"):
         notes_section = f"\n\n## Notes\n{_render_list(payload['notes'])}"
@@ -109,6 +116,7 @@ def _render_markdown(payload: dict[str, Any], artifact_path: str, json_path: str
         f"{_render_list(payload['artifacts'])}\n\n"
         "## Blockers\n"
         f"{_render_list(payload['blockers'])}"
+        f"{incidents_section}"
         f"{details_section}"
         f"{notes_section}\n"
     )
@@ -193,6 +201,8 @@ def _update_state_file(
         }
         state["currentCycle"] = None
         state["openBlockers"] = payload["blockers"]
+        if payload.get("incidentsProvided"):
+            state["incidents"] = payload.get("incidents", [])
         _upsert_published_project_from_metadata(state, payload.get("metadata", {}))
     else:
         raise ValueError(f"Unsupported state mode: {state_mode}")
@@ -235,6 +245,8 @@ def write_cycle_record(
         "artifact": artifact_path.as_posix(),
         "json": json_path.as_posix(),
     }
+    if normalized.get("incidentsProvided"):
+        record["incidents"] = normalized.get("incidents", [])
 
     output_dir = root / day_dir
     output_dir.mkdir(parents=True, exist_ok=True)

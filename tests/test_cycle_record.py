@@ -218,6 +218,83 @@ class CycleRecordTests(unittest.TestCase):
         self.assertEqual(state["updatedAt"], "2026-04-28T23:41:00Z")
         self.assertEqual(state["github"], {"org": "openclawghost1332"})
 
+    def test_write_cycle_record_renders_incidents_only_when_provided(self):
+        payload = {
+            "id": "20260429T124100Z-cycle-record-incident-sync",
+            "timestamp": "2026-04-29T12:41:00Z",
+            "summary": "Sync incidents through the cycle record helper.",
+            "changes": ["Added incident sync support."],
+            "artifacts": ["scripts/cycle_record.py", "tests/test_cycle_record.py"],
+            "blockers": [],
+            "incidents": ["Preview registry drift detected and repaired."],
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = write_cycle_record(payload, Path(tmpdir))
+            markdown = Path(tmpdir, result["artifact"]).read_text(encoding="utf-8")
+            machine = json.loads(Path(tmpdir, result["json"]).read_text(encoding="utf-8"))
+
+        self.assertIn("## Incidents", markdown)
+        self.assertIn("Preview registry drift detected and repaired.", markdown)
+        self.assertEqual(machine["incidents"], payload["incidents"])
+
+    def test_write_cycle_record_completed_mode_updates_incidents_when_provided(self):
+        payload = {
+            "id": "20260429T124100Z-cycle-record-incident-sync",
+            "timestamp": "2026-04-29T12:41:00Z",
+            "summary": "Sync incidents through the cycle record helper.",
+            "changes": ["Added incident sync support."],
+            "artifacts": ["scripts/cycle_record.py", "tests/test_cycle_record.py"],
+            "blockers": [],
+            "incidents": ["Preview registry drift detected and repaired."],
+        }
+        initial_state = {
+            "currentCycle": {"id": "in-flight"},
+            "lastCompletedCycle": {"id": "older"},
+            "openBlockers": [],
+            "incidents": ["Older incident."],
+            "updatedAt": "2026-04-29T00:00:00Z",
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            state_path = root / "status" / "state.json"
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps(initial_state), encoding="utf-8")
+
+            write_cycle_record(payload, root, state_path=Path("status/state.json"), state_mode="completed")
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(state["incidents"], payload["incidents"])
+
+    def test_write_cycle_record_completed_mode_preserves_incidents_when_omitted(self):
+        payload = {
+            "id": "20260429T124100Z-cycle-record-incident-sync",
+            "timestamp": "2026-04-29T12:41:00Z",
+            "summary": "Do not overwrite incidents when none are provided.",
+            "changes": ["Guarded incident sync behind explicit payload data."],
+            "artifacts": ["scripts/cycle_record.py", "tests/test_cycle_record.py"],
+            "blockers": [],
+        }
+        initial_state = {
+            "currentCycle": {"id": "in-flight"},
+            "lastCompletedCycle": {"id": "older"},
+            "openBlockers": [],
+            "incidents": ["Older incident."],
+            "updatedAt": "2026-04-29T00:00:00Z",
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            state_path = root / "status" / "state.json"
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps(initial_state), encoding="utf-8")
+
+            write_cycle_record(payload, root, state_path=Path("status/state.json"), state_mode="completed")
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(state["incidents"], ["Older incident."])
+
     def test_write_cycle_record_completed_mode_syncs_matching_preview_registry_timestamp(self):
         payload = {
             "id": "20260429T094100Z-cycle-record-preview-sync",

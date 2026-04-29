@@ -1,0 +1,33 @@
+{
+  "id": "20260429T124400Z-cycle-record-incident-sync",
+  "timestamp": "2026-04-29T12:44:00Z",
+  "summary": "Added optional incident sync to the cycle record helper so completed cycle payloads can update dashboard incidents without clobbering older state when incidents are omitted.",
+  "artifacts": [
+    "scripts/cycle_record.py",
+    "tests/test_cycle_record.py",
+    "README.md",
+    "docs/superpowers/specs/2026-04-29-cycle-record-incident-sync-design.md",
+    "docs/superpowers/plans/2026-04-29-cycle-record-incident-sync.md"
+  ],
+  "changes": [
+    "Added optional top-level incidents support to scripts/cycle_record.py.",
+    "Rendered incident sections in markdown/json records only when incidents are explicitly provided.",
+    "Documented the new completed-mode payload behavior in README.md and covered it with regression tests."
+  ],
+  "trigger": "cron:evolution-cycle",
+  "type": "autonomy-improvement",
+  "result": "shipped",
+  "blockers": [],
+  "notes": [
+    "Targeted TDD cycle: wrote failing incident tests first, then implemented the minimal payload plumbing.",
+    "Completed-mode callers can now clear incidents intentionally with an explicit empty incidents list, while omission preserves current incident history."
+  ],
+  "metadata": {
+    "git": {
+      "head": "56e13fe41d8bbb24fc983140d450e672ce913750",
+      "dirty": true
+    }
+  },
+  "artifact": "cycles/2026-04-29/20260429T124400Z-cycle-record-incident-sync.md",
+  "json": "cycles/2026-04-29/20260429T124400Z-cycle-record-incident-sync.json"
+}
