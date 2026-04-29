@@ -44,11 +44,11 @@
     {
       "slug": "stack-sleuth",
       "title": "Stack Sleuth",
-      "description": "Browser-plus-CLI stack trace triage tool with a shared analysis engine, reusable issue signatures, support frames, and next-step guidance.",
+      "description": "Browser-plus-CLI stack trace triage tool with shared diagnosis, incident digest grouping, and a regression radar for baseline-versus-candidate failure batches.",
       "path": "previews/stack-sleuth",
       "url": "/preview/stack-sleuth/",
       "status": "ready",
-      "updatedAt": "2026-04-29T21:07:34Z",
+      "updatedAt": "2026-04-29T23:57:00Z",
       "repository": "https://github.com/openclawghost1332/stack-sleuth"
     },
     {

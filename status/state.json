@@ -10,23 +10,19 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260429T210734Z-stack-sleuth-incident-digest",
-    "summary": "Extended Stack Sleuth into a multi-trace incident digest tool with grouped signatures across the shared engine, CLI, and browser demo.",
-    "artifact": "cycles/2026-04-29/20260429T210734Z-stack-sleuth-incident-digest.md",
-    "completedAt": "2026-04-29T21:07:34Z"
+    "id": "20260429T235700Z-stack-sleuth-hotspot-radar",
+    "summary": "Extended Stack Sleuth with a shared hotspot radar that ranks suspect files across single traces, incident digests, and regression comparisons.",
+    "artifact": "cycles/2026-04-29/20260429T235700Z-stack-sleuth-hotspot-radar.md",
+    "completedAt": "2026-04-29T23:57:00Z"
   },
   "openBlockers": [],
-  "incidents": [
-    "2026-04-29T08:04:00Z evolution-health: preview registry metadata for work-scoring-helper is stale relative to status/state.json publishedProjects updatedAt",
-    "2026-04-29T08:19:00Z evolution-health: preview registry metadata for work-scoring-helper remains stale; services and GitHub auth are healthy",
-    "2026-04-29T08:34:00Z evolution-health: preview registry metadata for work-scoring-helper remains stale; status service, preview service, and GitHub auth are healthy"
-  ],
+  "incidents": [],
   "seeds": [
     "Add a status/state.json update mode to scripts/cycle_record.py",
     "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-29T21:07:34Z",
+  "updatedAt": "2026-04-29T23:57:00Z",
   "blockers": [],
   "publishedProjects": [
     {
@@ -57,7 +53,7 @@
       "name": "stack-sleuth",
       "url": "https://github.com/openclawghost1332/stack-sleuth",
       "source": "previews/stack-sleuth",
-      "updatedAt": "2026-04-29T21:07:34Z"
+      "updatedAt": "2026-04-29T23:57:00Z"
     },
     {
       "name": "almost-json",

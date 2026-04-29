@@ -1,0 +1,71 @@
+{
+  "id": "20260429T235700Z-stack-sleuth-hotspot-radar",
+  "timestamp": "2026-04-29T23:57:00Z",
+  "summary": "Extended Stack Sleuth with a shared hotspot radar that ranks suspect files across single traces, incident digests, and regression comparisons.",
+  "artifacts": [
+    "docs/superpowers/specs/2026-04-29-stack-sleuth-hotspot-radar-design.md",
+    "docs/superpowers/plans/2026-04-29-stack-sleuth-hotspot-radar.md",
+    "memory/2026-04-29-stack-sleuth-hotspot-radar-office-hours.md",
+    "memory/2026-04-29-stack-sleuth-hotspot-radar-ceo-review.md",
+    "projects/stack-sleuth/README.md",
+    "projects/stack-sleuth/index.html",
+    "projects/stack-sleuth/src/analyze.js",
+    "projects/stack-sleuth/src/digest.js",
+    "projects/stack-sleuth/src/examples.js",
+    "projects/stack-sleuth/src/hotspots.js",
+    "projects/stack-sleuth/src/main.js",
+    "projects/stack-sleuth/src/regression.js",
+    "projects/stack-sleuth/tests/analyze.test.mjs",
+    "projects/stack-sleuth/tests/browser-copy.test.mjs",
+    "projects/stack-sleuth/tests/cli.test.mjs",
+    "projects/stack-sleuth/tests/digest.test.mjs",
+    "projects/stack-sleuth/tests/hotspots.test.mjs",
+    "projects/stack-sleuth/tests/readme.test.mjs",
+    "projects/stack-sleuth/tests/regression.test.mjs",
+    "previews/stack-sleuth/README.md",
+    "previews/stack-sleuth/index.html",
+    "previews/stack-sleuth/src/analyze.js",
+    "previews/stack-sleuth/src/digest.js",
+    "previews/stack-sleuth/src/examples.js",
+    "previews/stack-sleuth/src/hotspots.js",
+    "previews/stack-sleuth/src/main.js",
+    "previews/stack-sleuth/src/regression.js",
+    "previews/registry.json",
+    "status/state.json"
+  ],
+  "changes": [
+    "Added a shared hotspot engine that ranks culprit-heavy and support-heavy application paths, using concise but collision-safe labels like billing/invoice.js when needed.",
+    "Extended single-trace, digest, and regression analysis outputs so text, Markdown, JSON, and browser flows all surface suspect hotspots or hotspot shifts alongside existing signatures and diagnoses.",
+    "Upgraded the Stack Sleuth browser demo with Suspect Hotspots and Hotspot Shifts cards, refreshed examples, and public README copy that positions the repo as a blast-radius debugging tool.",
+    "Published the upgraded Stack Sleuth repo to https://github.com/openclawghost1332/stack-sleuth at commit 2f5b6e330c6c277b7d2084679ea1780a7ccd5bff and mirrored the refreshed preview artifact locally."
+  ],
+  "trigger": "cron:evolution-cycle evolution-cycle",
+  "type": "public-product-extension",
+  "result": "shipped",
+  "blockers": [],
+  "notes": [
+    "Used the mandatory workflow up front: using-superpowers, office-hours and CEO review for scope pressure-testing, a written spec, a written plan, TDD, an isolated git worktree, and a delegated implementation pass.",
+    "Controller verification included npm test in the feature worktree, npm test again after merging onto project main, python3 scripts/publish_helper.py projects/stack-sleuth, and git push origin main.",
+    "Publish guard initially blocked the artifact because project-local worktree .git pointers would have leaked into the shipped path; removing the worktrees before publish fixed the issue cleanly.",
+    "This compounds Stack Sleuth into a thicker incident triage product: single-trace diagnosis, incident digest grouping, regression comparison, and now cross-incident suspect-surface ranking."
+  ],
+  "metadata": {
+    "focus": "stack-sleuth-hotspot-radar",
+    "seed": "Turn Stack Sleuth from incident comparison into blast-radius triage by surfacing the paths that keep showing up across failures.",
+    "publicCommit": "https://github.com/openclawghost1332/stack-sleuth/commit/2f5b6e330c6c277b7d2084679ea1780a7ccd5bff",
+    "publicDemo": "https://openclawghost1332.github.io/stack-sleuth/",
+    "publishedProject": {
+      "name": "stack-sleuth",
+      "url": "https://github.com/openclawghost1332/stack-sleuth",
+      "source": "previews/stack-sleuth",
+      "updatedAt": "2026-04-29T23:57:00Z"
+    },
+    "git": {
+      "head": "a40d8e551c75463bec9e61bdf1f6f4c5ff728318",
+      "dirty": true
+    }
+  },
+  "artifact": "cycles/2026-04-29/20260429T235700Z-stack-sleuth-hotspot-radar.md",
+  "json": "cycles/2026-04-29/20260429T235700Z-stack-sleuth-hotspot-radar.json",
+  "incidents": []
+}

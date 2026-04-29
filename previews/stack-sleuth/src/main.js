@@ -1,5 +1,6 @@
 import { analyzeTrace, formatFrame, renderTextSummary } from './analyze.js';
 import { analyzeTraceDigest, splitTraceChunks, renderDigestTextSummary } from './digest.js';
+import { analyzeRegression } from './regression.js';
 import { examples } from './examples.js';
 
 const traceInput = document.querySelector('#trace-input');
@@ -10,6 +11,12 @@ const loadDigestButton = document.querySelector('#load-digest-button');
 const copyButton = document.querySelector('#copy-button');
 const caption = document.querySelector('#example-caption');
 
+const compareBaselineInput = document.querySelector('#compare-baseline-input');
+const compareCandidateInput = document.querySelector('#compare-candidate-input');
+const compareButton = document.querySelector('#compare-button');
+const loadRegressionButton = document.querySelector('#load-regression-button');
+const compareCaption = document.querySelector('#compare-caption');
+
 const runtimeValue = document.querySelector('#runtime-value');
 const headlineValue = document.querySelector('#headline-value');
 const culpritValue = document.querySelector('#culprit-value');
@@ -17,13 +24,18 @@ const confidenceValue = document.querySelector('#confidence-value');
 const tagsValue = document.querySelector('#tags-value');
 const signatureValue = document.querySelector('#signature-value');
 const supportFramesValue = document.querySelector('#support-frames-value');
+const hotspotsValue = document.querySelector('#hotspots-value');
 const summaryValue = document.querySelector('#summary-value');
 const digestGroupsValue = document.querySelector('#digest-groups-value');
 const checklistValue = document.querySelector('#checklist-value');
+const regressionSummaryValue = document.querySelector('#regression-summary-value');
+const regressionIncidentsValue = document.querySelector('#regression-incidents-value');
+const hotspotShiftsValue = document.querySelector('#hotspot-shifts-value');
 
 const jsExample = examples.find((item) => item.label === 'JavaScript undefined property');
 const pythonExample = examples.find((item) => item.label === 'Python missing key');
 const digestExample = examples.find((item) => item.label === 'Repeated incident digest');
+const regressionExample = examples.find((item) => item.label === 'Regression radar');
 
 function renderDiagnosis() {
   const traceText = traceInput.value.trim();
@@ -55,6 +67,7 @@ function renderDiagnosis() {
       ? report.supportFrames.map((frame) => formatFrame(frame))
       : ['No nearby application frames beyond the culprit were detected.']
   ));
+  hotspotsValue.replaceChildren(...buildListItems(buildHotspotItems(report.hotspots)));
   checklistValue.replaceChildren(...buildListItems(diagnosis.checklist));
 }
 
@@ -76,8 +89,70 @@ function renderDigest(traceText) {
       ? digest.groups[0].representative.supportFrames.map((frame) => formatFrame(frame))
       : ['Open the top incident to inspect its nearby application frames.']
   ));
+  hotspotsValue.replaceChildren(...buildListItems(buildHotspotItems(digest.hotspots)));
   checklistValue.replaceChildren(...buildListItems(
     digest.groups[0]?.representative?.diagnosis?.checklist ?? ['Inspect the top repeated incident first.']
+  ));
+}
+
+function renderRegressionWorkflow() {
+  const baseline = compareBaselineInput.value.trim();
+  const candidate = compareCandidateInput.value.trim();
+
+  if (!baseline || !candidate) {
+    resetRegressionState();
+    return;
+  }
+
+  const regression = analyzeRegression({ baseline, candidate });
+  const summary = regression.summary;
+  const topIncident = regression.incidents[0] ?? null;
+  const topReport = topIncident?.representative ?? null;
+
+  runtimeValue.textContent = 'comparison';
+  headlineValue.textContent = `${summary.totalCandidateTraces} candidate traces vs ${summary.totalBaselineTraces} baseline traces`;
+  culpritValue.textContent = formatFrame(topReport?.culpritFrame ?? null);
+  confidenceValue.textContent = topReport?.diagnosis?.confidence ?? 'comparison';
+  tagsValue.textContent = topIncident
+    ? [topIncident.status, ...(topReport?.diagnosis?.tags ?? [])].join(', ')
+    : '-';
+  signatureValue.textContent = topIncident?.signature ?? '-';
+  summaryValue.textContent = topIncident
+    ? `Top shift: ${topIncident.status} incident at ${formatFrame(topReport?.culpritFrame ?? null)} changed from ${topIncident.baselineCount} to ${topIncident.candidateCount} occurrences.`
+    : 'No incident changes detected.';
+  digestGroupsValue.replaceChildren(...buildListItems(
+    regression.incidents.length
+      ? regression.incidents.map((incident) => `${incident.status}: ${incident.candidateCount} vs ${incident.baselineCount} (${formatDelta(incident.delta)})`)
+      : ['No incident changes detected.']
+  ));
+  supportFramesValue.replaceChildren(...buildListItems(
+    topReport?.supportFrames?.length
+      ? topReport.supportFrames.map((frame) => formatFrame(frame))
+      : ['Open the top changed incident to inspect nearby supporting frames.']
+  ));
+  hotspotsValue.replaceChildren(...buildListItems(buildHotspotItems(topReport?.hotspots ?? [])));
+  hotspotShiftsValue.replaceChildren(...buildListItems(
+    regression.hotspotShifts.length
+      ? regression.hotspotShifts.map((shift) => `${shift.status}: ${shift.label} ${formatDelta(shift.delta)} (${shift.baselineScore} → ${shift.candidateScore})`)
+      : ['No hotspot shifts detected yet.']
+  ));
+  checklistValue.replaceChildren(...buildListItems(buildRegressionChecklist(summary, topIncident)));
+
+  regressionSummaryValue.textContent = [
+    `${summary.newCount} new`,
+    `${summary.volumeUpCount} volume-up`,
+    `${summary.recurringCount} recurring`,
+    `${summary.volumeDownCount} volume-down`,
+    `${summary.resolvedCount} resolved`,
+    `${summary.totalBaselineTraces} baseline traces`,
+    `${summary.totalCandidateTraces} candidate traces`
+  ].join(', ');
+
+  regressionIncidentsValue.replaceChildren(...buildListItems(
+    regression.incidents.map((incident) => {
+      const culprit = formatFrame(incident.representative?.culpritFrame ?? null);
+      return `${incident.status}: ${incident.candidateCount} vs ${incident.baselineCount} (${formatDelta(incident.delta)}) at ${culprit}`;
+    })
   ));
 }
 
@@ -95,8 +170,21 @@ function resetEmptyState() {
     'Repeated incidents will appear here when Stack Sleuth detects multiple traces.'
   ]));
   summaryValue.textContent = 'Your diagnosis summary will appear here.';
+  hotspotsValue.replaceChildren(...buildListItems([
+    'Suspect hotspots will appear here when Stack Sleuth detects repeated culprit or support paths.'
+  ]));
   checklistValue.replaceChildren(...buildListItems([
     'Run an example or paste one or more real traces to see actionable next steps.'
+  ]));
+}
+
+function resetRegressionState() {
+  regressionSummaryValue.textContent = 'Paste baseline and candidate traces to compare releases.';
+  regressionIncidentsValue.replaceChildren(...buildListItems([
+    'New, resolved, and volume-shifted incidents will appear here after a comparison.'
+  ]));
+  hotspotShiftsValue.replaceChildren(...buildListItems([
+    'Hotspot shifts between baseline and candidate batches will appear here after a comparison.'
   ]));
 }
 
@@ -108,6 +196,17 @@ function loadExample(example) {
   traceInput.value = example.trace;
   caption.textContent = example.caption;
   renderDiagnosis();
+}
+
+function loadRegressionExample(example) {
+  if (!example) {
+    return;
+  }
+
+  compareBaselineInput.value = example.baseline;
+  compareCandidateInput.value = example.candidate;
+  compareCaption.textContent = example.caption;
+  renderRegressionWorkflow();
 }
 
 async function copyDiagnosis() {
@@ -132,10 +231,45 @@ function buildListItems(items) {
   });
 }
 
+function formatDelta(delta) {
+  return delta > 0 ? `+${delta}` : String(delta);
+}
+
+function buildHotspotItems(hotspots) {
+  if (!hotspots.length) {
+    return ['No suspect hotspots detected yet.'];
+  }
+
+  return hotspots.slice(0, 5).map((hotspot) => (
+    `${hotspot.label} scored ${hotspot.score} (${hotspot.culpritCount} culprit, ${hotspot.supportCount} support)`
+  ));
+}
+
+function buildRegressionChecklist(summary, topIncident) {
+  const checklist = [];
+
+  if (summary.newCount > 0) {
+    checklist.push('Investigate brand-new signatures first, especially if they appeared right after the latest deploy.');
+  }
+  if (summary.volumeUpCount > 0) {
+    checklist.push('Compare payloads, traffic shape, or rollout segments for incidents that spiked in volume.');
+  }
+  if (summary.resolvedCount > 0) {
+    checklist.push('Confirm resolved incidents against production telemetry before closing the loop.');
+  }
+  if (topIncident?.representative?.diagnosis?.checklist?.length) {
+    checklist.push(...topIncident.representative.diagnosis.checklist.slice(0, 2));
+  }
+
+  return checklist.length ? checklist : ['Review the compared batches for signature drift or parsing mismatches.'];
+}
+
 explainButton?.addEventListener('click', renderDiagnosis);
 loadJsButton?.addEventListener('click', () => loadExample(jsExample));
 loadPythonButton?.addEventListener('click', () => loadExample(pythonExample));
 loadDigestButton?.addEventListener('click', () => loadExample(digestExample));
+loadRegressionButton?.addEventListener('click', () => loadRegressionExample(regressionExample));
+compareButton?.addEventListener('click', renderRegressionWorkflow);
 copyButton?.addEventListener('click', copyDiagnosis);
 traceInput?.addEventListener('input', () => {
   if (!traceInput.value.trim()) {
@@ -143,5 +277,18 @@ traceInput?.addEventListener('input', () => {
     resetEmptyState();
   }
 });
+compareBaselineInput?.addEventListener('input', () => {
+  if (!compareBaselineInput.value.trim() || !compareCandidateInput.value.trim()) {
+    compareCaption.textContent = 'Paste baseline and candidate traces to spot new, resolved, and worsening incidents.';
+    resetRegressionState();
+  }
+});
+compareCandidateInput?.addEventListener('input', () => {
+  if (!compareBaselineInput.value.trim() || !compareCandidateInput.value.trim()) {
+    compareCaption.textContent = 'Paste baseline and candidate traces to spot new, resolved, and worsening incidents.';
+    resetRegressionState();
+  }
+});
 
 loadExample(jsExample);
+resetRegressionState();
