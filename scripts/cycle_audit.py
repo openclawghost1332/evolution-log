@@ -60,6 +60,7 @@ def audit_workspace(root: Path) -> dict[str, Any]:
     published_projects = state.get("publishedProjects", [])
     published_project_count = len(published_projects)
     registered_preview_paths: set[str] = set()
+    registered_previews: dict[str, dict[str, Any]] = {}
 
     registry_rel = Path("previews/registry.json")
     registry_path = root / registry_rel
@@ -81,6 +82,7 @@ def audit_workspace(root: Path) -> dict[str, Any]:
                         issues.append(f"Preview entry missing path: {slug}")
                         continue
                     registered_preview_paths.add(preview_path)
+                    registered_previews[preview_path] = preview
                     if not (root / preview_path).exists():
                         issues.append(f"Registered preview path does not exist: {preview_path}")
 
@@ -89,6 +91,20 @@ def audit_workspace(root: Path) -> dict[str, Any]:
         if source and source not in registered_preview_paths:
             issues.append(
                 f"Published project source is not registered in previews/registry.json: {source}"
+            )
+            continue
+
+        if not source:
+            continue
+
+        preview = registered_previews.get(source)
+        preview_updated_at = _normalize_timestamp((preview or {}).get("updatedAt"))
+        project_updated_at = _normalize_timestamp(project.get("updatedAt"))
+        if preview and preview_updated_at != project_updated_at:
+            issues.append(
+                f"Preview registry metadata is stale for {preview.get('slug', source)}: "
+                "previews/registry.json updatedAt does not match "
+                "status/state.json publishedProjects updatedAt"
             )
 
     if not last_completed:

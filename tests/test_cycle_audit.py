@@ -9,7 +9,13 @@ from scripts.cycle_audit import audit_workspace, main
 
 
 class CycleAuditTests(unittest.TestCase):
-    def _write_healthy_state(self, root: Path, *, source: str = "previews/work-scoring-helper") -> None:
+    def _write_healthy_state(
+        self,
+        root: Path,
+        *,
+        source: str = "previews/work-scoring-helper",
+        project_updated_at: str = "2026-04-28T22:47:20.000Z",
+    ) -> None:
         state_dir = root / "status"
         state_dir.mkdir(exist_ok=True)
         (state_dir / "state.json").write_text(
@@ -28,7 +34,7 @@ class CycleAuditTests(unittest.TestCase):
                             "name": "work-scoring-helper",
                             "source": source,
                             "url": "https://example.com/work-scoring-helper",
-                            "updatedAt": "2026-04-28T22:47:20.000Z",
+                            "updatedAt": project_updated_at,
                         }
                     ],
                     "updatedAt": "2026-04-29T03:41:00Z",
@@ -56,7 +62,13 @@ class CycleAuditTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-    def _write_preview_registry(self, root: Path, *, path: str = "previews/work-scoring-helper") -> None:
+    def _write_preview_registry(
+        self,
+        root: Path,
+        *,
+        path: str = "previews/work-scoring-helper",
+        updated_at: str = "2026-04-28T22:47:20.000Z",
+    ) -> None:
         preview_dir = root / path
         preview_dir.mkdir(parents=True)
         registry_dir = root / "previews"
@@ -70,6 +82,7 @@ class CycleAuditTests(unittest.TestCase):
                             "slug": "work-scoring-helper",
                             "path": path,
                             "status": "ready",
+                            "updatedAt": updated_at,
                         }
                     ],
                 }
@@ -275,6 +288,39 @@ class CycleAuditTests(unittest.TestCase):
 
         self.assertFalse(report["ok"])
         self.assertIn("Invalid preview registry json: previews/registry.json", report["issues"])
+
+    def test_audit_workspace_flags_preview_timestamp_drift(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            self._write_healthy_cycle_files(root)
+            self._write_healthy_state(root, project_updated_at="2026-04-29T07:45:44Z")
+            registry_dir = root / "previews"
+            registry_dir.mkdir(exist_ok=True)
+            (root / "previews" / "work-scoring-helper").mkdir(parents=True, exist_ok=True)
+            (registry_dir / "registry.json").write_text(
+                json.dumps(
+                    {
+                        "version": 1,
+                        "previews": [
+                            {
+                                "slug": "work-scoring-helper",
+                                "path": "previews/work-scoring-helper",
+                                "status": "ready",
+                                "updatedAt": "2026-04-28T22:47:20.000Z",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            report = audit_workspace(root)
+
+        self.assertFalse(report["ok"])
+        self.assertIn(
+            "Preview registry metadata is stale for work-scoring-helper: previews/registry.json updatedAt does not match status/state.json publishedProjects updatedAt",
+            report["issues"],
+        )
 
     def test_main_prints_json_and_nonzero_exit_on_issues(self):
         with tempfile.TemporaryDirectory() as tmpdir:

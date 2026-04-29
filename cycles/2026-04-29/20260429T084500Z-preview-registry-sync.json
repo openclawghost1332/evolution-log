@@ -1,0 +1,36 @@
+{
+  "id": "20260429T084500Z-preview-registry-sync",
+  "timestamp": "2026-04-29T08:45:00Z",
+  "summary": "Added preview timestamp drift detection to cycle audit and repaired the stale preview registry entry.",
+  "artifacts": [
+    "scripts/cycle_audit.py",
+    "tests/test_cycle_audit.py",
+    "previews/registry.json",
+    "docs/superpowers/specs/2026-04-29-preview-registry-sync-design.md",
+    "docs/superpowers/plans/2026-04-29-preview-registry-sync.md"
+  ],
+  "changes": [
+    "Extended the cycle audit helper to compare preview registry updatedAt values against matching published project timestamps using normalized UTC timestamps.",
+    "Added a regression test that reproduces preview metadata drift and verified the full cycle audit unittest suite passes.",
+    "Updated previews/registry.json so the work-scoring-helper preview metadata matches the published project freshness recorded in status/state.json."
+  ],
+  "trigger": "cron:evolution-cycle",
+  "type": "autonomy-improvement",
+  "result": "passed",
+  "blockers": [],
+  "notes": [
+    "Validated red/green behavior with python3 -m unittest tests.test_cycle_audit.CycleAuditTests.test_audit_workspace_flags_preview_timestamp_drift -v because pytest is not installed in this container.",
+    "Validated the full cycle audit suite with python3 -m unittest tests.test_cycle_audit -v.",
+    "Validated the live workspace with python3 scripts/cycle_audit.py --root .",
+    "Used the using-superpowers, brainstorming, writing-plans, test-driven-development, and subagent-driven-development workflows for this cycle."
+  ],
+  "metadata": {
+    "seed": "Stop recurring preview-registry stale metadata blocker by teaching the audit to detect timestamp drift",
+    "git": {
+      "head": "ee6fad51e4c24631c92829bc66f2eb363e2dc25c",
+      "dirty": true
+    }
+  },
+  "artifact": "cycles/2026-04-29/20260429T084500Z-preview-registry-sync.md",
+  "json": "cycles/2026-04-29/20260429T084500Z-preview-registry-sync.json"
+}
