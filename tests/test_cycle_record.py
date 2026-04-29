@@ -218,6 +218,91 @@ class CycleRecordTests(unittest.TestCase):
         self.assertEqual(state["updatedAt"], "2026-04-28T23:41:00Z")
         self.assertEqual(state["github"], {"org": "openclawghost1332"})
 
+    def test_write_cycle_record_completed_mode_syncs_matching_preview_registry_timestamp(self):
+        payload = {
+            "id": "20260429T094100Z-cycle-record-preview-sync",
+            "timestamp": "2026-04-29T09:41:00Z",
+            "summary": "Sync preview metadata during completed cycle recording.",
+            "changes": ["Added preview registry sync to cycle record helper."],
+            "artifacts": ["scripts/cycle_record.py", "tests/test_cycle_record.py"],
+            "blockers": [],
+        }
+        initial_state = {
+            "currentCycle": {"id": "in-flight"},
+            "lastCompletedCycle": {"id": "older"},
+            "openBlockers": [],
+            "updatedAt": "2026-04-29T00:00:00Z",
+            "publishedProjects": [
+                {
+                    "name": "work-scoring-helper",
+                    "source": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T09:30:00Z",
+                }
+            ],
+        }
+        initial_registry = {
+            "previews": [
+                {
+                    "slug": "work-scoring-helper",
+                    "path": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T07:45:44Z",
+                    "title": "OpenClaw Work Scoring Helper",
+                }
+            ]
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            state_path = root / "status" / "state.json"
+            registry_path = root / "previews" / "registry.json"
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            registry_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps(initial_state), encoding="utf-8")
+            registry_path.write_text(json.dumps(initial_registry), encoding="utf-8")
+
+            write_cycle_record(payload, root, state_path=Path("status/state.json"), state_mode="completed")
+
+            registry = json.loads(registry_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(
+            registry["previews"][0]["updatedAt"],
+            "2026-04-29T09:30:00Z",
+        )
+
+    def test_write_cycle_record_started_mode_does_not_require_preview_registry(self):
+        payload = {
+            "id": "20260428T234100Z-cycle-record-helper",
+            "timestamp": "2026-04-28T23:41:00Z",
+            "summary": "Ship a helper for consistent cycle notes.",
+            "changes": ["Added a cycle record helper script."],
+            "artifacts": ["scripts/cycle_record.py", "tests/test_cycle_record.py"],
+            "blockers": [],
+        }
+        initial_state = {
+            "currentCycle": None,
+            "lastCompletedCycle": {"id": "older"},
+            "openBlockers": [],
+            "updatedAt": "2026-04-28T00:00:00Z",
+            "publishedProjects": [
+                {
+                    "name": "work-scoring-helper",
+                    "source": "previews/work-scoring-helper",
+                    "updatedAt": "2026-04-29T09:30:00Z",
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            state_path = root / "status" / "state.json"
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps(initial_state), encoding="utf-8")
+
+            write_cycle_record(payload, root, state_path=Path("status/state.json"), state_mode="started")
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(state["currentCycle"]["id"], payload["id"])
+
     def test_main_rejects_state_mode_without_state_path(self):
         payload = {
             "id": "20260428T234100Z-cycle-record-helper",

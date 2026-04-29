@@ -114,6 +114,37 @@ def _render_markdown(payload: dict[str, Any], artifact_path: str, json_path: str
     )
 
 
+def _sync_preview_registry_from_state(root: Path, state: dict[str, Any]) -> None:
+    registry_path = root / "previews" / "registry.json"
+    if not registry_path.exists():
+        return
+
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    previews = registry.get("previews")
+    if not isinstance(previews, list):
+        return
+
+    preview_by_path = {
+        preview.get("path"): preview
+        for preview in previews
+        if isinstance(preview, dict) and preview.get("path")
+    }
+    changed = False
+    for project in state.get("publishedProjects", []):
+        if not isinstance(project, dict):
+            continue
+        source = project.get("source")
+        updated_at = project.get("updatedAt")
+        preview = preview_by_path.get(source)
+        if preview and updated_at and preview.get("updatedAt") != updated_at:
+            preview["updatedAt"] = updated_at
+            changed = True
+
+    if changed:
+        registry_path.write_text(json.dumps(registry, indent=2) + "\n", encoding="utf-8")
+
+
+
 def _update_state_file(
     payload: dict[str, Any],
     root: Path,
@@ -146,6 +177,8 @@ def _update_state_file(
 
     state["updatedAt"] = timestamp
     resolved_state_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+    if state_mode == "completed":
+        _sync_preview_registry_from_state(root, state)
 
 
 

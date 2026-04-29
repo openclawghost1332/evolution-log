@@ -23,6 +23,7 @@ Optional flags:
 - `--root <dir>` writes the `cycles/YYYY-MM-DD/` output tree somewhere other than the workspace root.
 - `--state <path>` updates an existing state JSON file after writing the record.
 - `--state-mode started|completed` chooses whether to stamp `currentCycle` or `lastCompletedCycle` style fields. `--state-mode` requires `--state`.
+- In `completed` mode, matching `previews/registry.json` entries are also refreshed from `publishedProjects[].updatedAt` when the registry file exists.
 
 Example, mark a cycle completed and sync blockers into the dashboard state:
 
