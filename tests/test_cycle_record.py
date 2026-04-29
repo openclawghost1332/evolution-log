@@ -1,9 +1,11 @@
 import contextlib
 import io
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from scripts.cycle_record import main, write_cycle_record
 
@@ -45,6 +47,65 @@ class CycleRecordTests(unittest.TestCase):
         self.assertIn("## Changes\n- None.", markdown)
         self.assertIn("## Artifacts\n- None.", markdown)
         self.assertIn("## Blockers\n- None.", markdown)
+
+    def test_write_cycle_record_includes_git_metadata_in_json_and_markdown(self):
+        payload = {
+            "id": "20260428T234100Z-cycle-record-helper",
+            "timestamp": "2026-04-28T23:41:00Z",
+            "summary": "Ship a helper for consistent cycle notes.",
+            "changes": ["Added a cycle record helper script."],
+            "artifacts": ["scripts/cycle_record.py", "tests/test_cycle_record.py"],
+            "blockers": [],
+            "metadata": {"source": "cron"},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.name", "Test User"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "config", "user.email", "test@example.com"], cwd=root, check=True, capture_output=True)
+            tracked = root / "tracked.txt"
+            tracked.write_text("tracked\n", encoding="utf-8")
+            subprocess.run(["git", "add", "tracked.txt"], cwd=root, check=True, capture_output=True)
+            subprocess.run(["git", "commit", "-m", "initial"], cwd=root, check=True, capture_output=True)
+            tracked.write_text("tracked and dirty\n", encoding="utf-8")
+
+            result = write_cycle_record(payload, root)
+            markdown = Path(root, result["artifact"]).read_text(encoding="utf-8")
+            machine = json.loads(Path(root, result["json"]).read_text(encoding="utf-8"))
+
+        self.assertEqual(machine["metadata"]["source"], "cron")
+        self.assertIn("git", machine["metadata"])
+        self.assertRegex(machine["metadata"]["git"]["head"], r"^[0-9a-f]{40}$")
+        self.assertTrue(machine["metadata"]["git"]["dirty"])
+        self.assertIn("## Details", markdown)
+        self.assertIn("- source: cron", markdown)
+        self.assertIn("- git.head:", markdown)
+        self.assertIn("- git.dirty: true", markdown)
+
+    def test_write_cycle_record_gracefully_skips_git_metadata_when_git_unavailable(self):
+        payload = {
+            "id": "20260428T234100Z-cycle-record-helper",
+            "timestamp": "2026-04-28T23:41:00Z",
+            "summary": "Ship a helper for consistent cycle notes.",
+            "changes": ["Added a cycle record helper script."],
+            "artifacts": ["scripts/cycle_record.py"],
+            "blockers": [],
+            "metadata": {"source": "cron"},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with mock.patch("subprocess.run", side_effect=FileNotFoundError):
+                result = write_cycle_record(payload, Path(tmpdir))
+
+            markdown = Path(tmpdir, result["artifact"]).read_text(encoding="utf-8")
+            machine = json.loads(Path(tmpdir, result["json"]).read_text(encoding="utf-8"))
+
+        self.assertEqual(machine["metadata"], {"source": "cron"})
+        self.assertIn("## Details", markdown)
+        self.assertIn("- source: cron", markdown)
+        self.assertNotIn("git.head", markdown)
+        self.assertNotIn("git.dirty", markdown)
 
     def test_write_cycle_record_rejects_missing_required_keys(self):
         payload = {

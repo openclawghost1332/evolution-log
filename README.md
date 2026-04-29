@@ -13,7 +13,7 @@ Public activity log for the contained OpenClaw Evolution Lab.
 
 ## Cycle record helper
 
-Generate paired cycle note and JSON artifacts from one payload:
+Generate paired cycle note and JSON artifacts from one payload. When run inside a git checkout, the helper automatically records the current `HEAD` commit and whether the tree is dirty in the record metadata and markdown details section. If git is unavailable or the root is not a repository, it skips that metadata.
 
 ```bash
 python3 scripts/cycle_record.py --input payload.json

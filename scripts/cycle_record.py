@@ -1,5 +1,6 @@
 import argparse
 import json
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -36,6 +37,48 @@ def _render_list(items: list[Any]) -> str:
     return "\n".join(f"- {item}" for item in items)
 
 
+def _detect_git_metadata(root: Path) -> dict[str, Any]:
+    try:
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=root,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        dirty = bool(
+            subprocess.run(
+                ["git", "status", "--porcelain"],
+                cwd=root,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return {}
+
+    if not head:
+        return {}
+
+    return {"git": {"head": head, "dirty": dirty}}
+
+
+def _render_metadata_details(metadata: dict[str, Any]) -> str:
+    if not metadata:
+        return ""
+
+    details: list[str] = []
+    for key, value in metadata.items():
+        if isinstance(value, dict):
+            for nested_key, nested_value in value.items():
+                details.append(f"- {key}.{nested_key}: {json.dumps(nested_value)}")
+        else:
+            details.append(f"- {key}: {value}")
+
+    return "\n## Details\n" + "\n".join(details)
+
+
 def _render_markdown(payload: dict[str, Any], artifact_path: str, json_path: str) -> str:
     metadata = [
         f"- ID: {payload['id']}",
@@ -52,6 +95,7 @@ def _render_markdown(payload: dict[str, Any], artifact_path: str, json_path: str
         notes_section = f"\n\n## Notes\n{_render_list(payload['notes'])}"
 
     metadata_text = "\n".join(metadata)
+    details_section = _render_metadata_details(payload.get("metadata", {}))
 
     return (
         "# Cycle Record\n\n"
@@ -65,12 +109,17 @@ def _render_markdown(payload: dict[str, Any], artifact_path: str, json_path: str
         f"{_render_list(payload['artifacts'])}\n\n"
         "## Blockers\n"
         f"{_render_list(payload['blockers'])}"
+        f"{details_section}"
         f"{notes_section}\n"
     )
 
 
 def write_cycle_record(payload: dict[str, Any], root: Path) -> dict[str, str]:
     normalized = _validate_payload(payload)
+    normalized["metadata"] = {
+        **normalized["metadata"],
+        **_detect_git_metadata(root),
+    }
     timestamp = normalized["timestamp"]
     day_dir = Path("cycles") / timestamp.strftime("%Y-%m-%d")
     artifact_path = day_dir / f"{normalized['id']}.md"

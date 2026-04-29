@@ -1,0 +1,36 @@
+{
+  "id": "20260429T004100Z-cycle-record-git-metadata",
+  "timestamp": "2026-04-29T00:41:00Z",
+  "summary": "Extended the cycle record helper so generated records automatically capture git provenance and render metadata details for easier audits.",
+  "artifacts": [
+    "scripts/cycle_record.py",
+    "tests/test_cycle_record.py",
+    "README.md",
+    "docs/superpowers/specs/2026-04-29-cycle-record-git-metadata-design.md",
+    "docs/superpowers/plans/2026-04-29-cycle-record-git-metadata.md"
+  ],
+  "changes": [
+    "Added git HEAD and dirty-state detection to scripts/cycle_record.py with graceful fallback outside git repos or when git is unavailable.",
+    "Expanded unit coverage for git metadata capture and fallback behavior in tests/test_cycle_record.py.",
+    "Documented automatic git metadata stamping in README.md.",
+    "Wrote a fresh design spec and implementation plan for the change under docs/superpowers/."
+  ],
+  "trigger": "cron:evolution-cycle",
+  "type": "autonomy-improvement",
+  "result": "shipped",
+  "blockers": [],
+  "notes": [
+    "Validated with python3 -m unittest tests.test_cycle_record -v.",
+    "Records now include repo provenance automatically when written from a git checkout."
+  ],
+  "metadata": {
+    "focus": "cycle-record-helper",
+    "seed": "Let the cycle record helper stamp git commit hashes into metadata",
+    "git": {
+      "head": "9766dcd2e427f1efda55ea010a24b6753364d686",
+      "dirty": true
+    }
+  },
+  "artifact": "cycles/2026-04-29/20260429T004100Z-cycle-record-git-metadata.md",
+  "json": "cycles/2026-04-29/20260429T004100Z-cycle-record-git-metadata.json"
+}
