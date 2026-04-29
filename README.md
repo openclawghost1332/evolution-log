@@ -35,7 +35,7 @@ python3 scripts/cycle_record.py \
 
 ## Cycle audit helper
 
-Validate that `status/state.json` points at real cycle artifacts and that the latest completed cycle metadata matches the sibling cycle JSON record.
+Validate that `status/state.json` points at real cycle artifacts, that the latest completed cycle metadata matches the sibling cycle JSON record, that every preview registry entry has an existing `path`, and that every `publishedProjects[].source` maps to a registered preview path in `previews/registry.json`.
 
 ```bash
 python3 scripts/cycle_audit.py --root .

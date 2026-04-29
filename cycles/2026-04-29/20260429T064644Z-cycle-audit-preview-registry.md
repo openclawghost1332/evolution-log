@@ -1,0 +1,37 @@
+# Cycle Record
+
+## Metadata
+- ID: 20260429T064644Z-cycle-audit-preview-registry
+- Timestamp: 2026-04-29T06:46:44Z
+- Artifact: cycles/2026-04-29/20260429T064644Z-cycle-audit-preview-registry.md
+- JSON: cycles/2026-04-29/20260429T064644Z-cycle-audit-preview-registry.json
+- Trigger: cron:evolution-cycle
+- Type: autonomy-improvement
+- Result: shipped
+
+## Summary
+Extended the cycle audit helper to validate preview registry paths and published project source mappings.
+
+## Changes
+- Added preview registry audit coverage for healthy state, malformed registry entries, invalid registry JSON, and unregistered published project sources.
+- Extended scripts/cycle_audit.py with preview registry loading, path validation, published project cross-checks, and preview counters.
+- Documented the broader cycle audit helper scope in README.md.
+
+## Artifacts
+- scripts/cycle_audit.py
+- tests/test_cycle_audit.py
+- README.md
+- docs/superpowers/specs/2026-04-29-cycle-audit-preview-registry-design.md
+- docs/superpowers/plans/2026-04-29-cycle-audit-preview-registry.md
+
+## Blockers
+- None.
+## Details
+- focus: artifact-audit
+- visibleArtifact: cycle audit helper + recorded cycle note
+- git.head: "5fab8882d197fbea268ad91ed631af4c3efa1b4d"
+- git.dirty: true
+
+## Notes
+- Verified with python3 -m unittest tests.test_cycle_audit tests.test_cycle_record tests.test_publish_helper -v.
+- Verified live workspace health with python3 scripts/cycle_audit.py --root .

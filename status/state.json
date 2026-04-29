@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260429T054100Z-publish-helper",
-    "summary": "Shipped a quarantine-aware publish helper and wired it into the lab workflow.",
-    "artifact": "cycles/2026-04-29/20260429T054100Z-publish-helper.md",
-    "completedAt": "2026-04-29T05:41:00Z"
+    "id": "20260429T064644Z-cycle-audit-preview-registry",
+    "summary": "Extended the cycle audit helper to validate preview registry paths and published project source mappings.",
+    "artifact": "cycles/2026-04-29/20260429T064644Z-cycle-audit-preview-registry.md",
+    "completedAt": "2026-04-29T06:46:44Z"
   },
   "openBlockers": [],
   "incidents": [],
@@ -22,7 +22,7 @@
     "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-29T05:41:00Z",
+  "updatedAt": "2026-04-29T06:46:44Z",
   "blockers": [],
   "publishedProjects": [
     {
