@@ -6,14 +6,21 @@ from pathlib import Path
 from typing import Any
 
 REQUIRED_FIELDS = ("id", "timestamp", "summary", "artifacts", "changes")
+STARTED_REQUIRED_FIELDS = ("id", "timestamp", "summary")
+STARTED_LIST_DEFAULTS = ("artifacts", "changes", "blockers", "notes")
 
 
-def _validate_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    for field in REQUIRED_FIELDS:
+def _validate_payload(payload: dict[str, Any], state_mode: str | None = None) -> dict[str, Any]:
+    required_fields = STARTED_REQUIRED_FIELDS if state_mode == "started" else REQUIRED_FIELDS
+    for field in required_fields:
         if field not in payload:
             raise ValueError(f"Missing required field: {field}")
 
     normalized = dict(payload)
+    if state_mode == "started":
+        for field in STARTED_LIST_DEFAULTS:
+            normalized.setdefault(field, [])
+
     normalized["timestamp"] = _parse_timestamp(payload["timestamp"])
     normalized["incidentsProvided"] = "incidents" in payload
     if normalized["incidentsProvided"]:
@@ -220,7 +227,7 @@ def write_cycle_record(
     state_path: Path | None = None,
     state_mode: str | None = None,
 ) -> dict[str, str]:
-    normalized = _validate_payload(payload)
+    normalized = _validate_payload(payload, state_mode=state_mode)
     normalized["metadata"] = {
         **normalized["metadata"],
         **_detect_git_metadata(root),

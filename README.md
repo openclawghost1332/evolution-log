@@ -23,8 +23,18 @@ Optional flags:
 - `--root <dir>` writes the `cycles/YYYY-MM-DD/` output tree somewhere other than the workspace root.
 - `--state <path>` updates an existing state JSON file after writing the record.
 - `--state-mode started|completed` chooses whether to stamp `currentCycle` or `lastCompletedCycle` style fields. `--state-mode` requires `--state`.
+- In `started` mode, the payload may be sparse and only needs `id`, `timestamp`, and `summary`. Omitted `changes`, `artifacts`, `blockers`, and `notes` are written as empty arrays, and the markdown record renders `- None.` placeholders.
 - Completed-mode payloads may include an optional top-level `incidents` list. When present, `status/state.json.incidents` is replaced with that list. When omitted, existing incidents are preserved.
 - In `completed` mode, matching `previews/registry.json` entries are also refreshed from `publishedProjects[].updatedAt` when the registry file exists.
+
+Example, start a cycle safely before final artifacts are known:
+
+```bash
+python3 scripts/cycle_record.py \
+  --input kickoff-payload.json \
+  --state status/state.json \
+  --state-mode started
+```
 
 Example, mark a cycle completed and sync blockers into the dashboard state:
 
