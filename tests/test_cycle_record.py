@@ -136,6 +136,54 @@ class CycleRecordTests(unittest.TestCase):
             self.assertFalse(any(root.rglob("*.md")))
             self.assertFalse(any(root.rglob("*.json")))
 
+    def test_write_cycle_record_started_mode_accepts_sparse_kickoff_payload(self):
+        payload = {
+            "id": "20260428T234100Z-cycle-record-helper",
+            "timestamp": "2026-04-28T23:41:00Z",
+            "summary": "Ship a helper for consistent cycle notes.",
+        }
+        initial_state = {
+            "currentCycle": None,
+            "lastCompletedCycle": {"id": "older"},
+            "openBlockers": ["Keep existing blockers."],
+            "updatedAt": "2026-04-28T00:00:00Z",
+            "focus": {"mode": "ship"},
+            "quarantine": {"active": False},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            state_path = root / "status" / "state.json"
+            state_path.parent.mkdir(parents=True, exist_ok=True)
+            state_path.write_text(json.dumps(initial_state), encoding="utf-8")
+
+            result = write_cycle_record(payload, root, state_path=Path("status/state.json"), state_mode="started")
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+            markdown = Path(root, result["artifact"]).read_text(encoding="utf-8")
+            machine = json.loads(Path(root, result["json"]).read_text(encoding="utf-8"))
+
+        self.assertEqual(
+            state["currentCycle"],
+            {
+                "id": payload["id"],
+                "summary": payload["summary"],
+                "artifact": "cycles/2026-04-28/20260428T234100Z-cycle-record-helper.md",
+                "startedAt": "2026-04-28T23:41:00Z",
+            },
+        )
+        self.assertEqual(state["lastCompletedCycle"], {"id": "older"})
+        self.assertEqual(state["openBlockers"], ["Keep existing blockers."])
+        self.assertEqual(state["updatedAt"], "2026-04-28T23:41:00Z")
+        self.assertEqual(state["focus"], {"mode": "ship"})
+        self.assertEqual(state["quarantine"], {"active": False})
+        self.assertEqual(machine["changes"], [])
+        self.assertEqual(machine["artifacts"], [])
+        self.assertEqual(machine["blockers"], [])
+        self.assertEqual(machine["notes"], [])
+        self.assertIn("## Changes\n- None.", markdown)
+        self.assertIn("## Artifacts\n- None.", markdown)
+        self.assertIn("## Blockers\n- None.", markdown)
+
     def test_write_cycle_record_updates_state_in_started_mode(self):
         payload = {
             "id": "20260428T234100Z-cycle-record-helper",
@@ -177,6 +225,17 @@ class CycleRecordTests(unittest.TestCase):
         self.assertEqual(state["updatedAt"], "2026-04-28T23:41:00Z")
         self.assertEqual(state["focus"], {"mode": "ship"})
         self.assertEqual(state["quarantine"], {"active": False})
+
+    def test_write_cycle_record_completed_mode_rejects_sparse_kickoff_payload(self):
+        payload = {
+            "id": "20260428T234100Z-cycle-record-helper",
+            "timestamp": "2026-04-28T23:41:00Z",
+            "summary": "Ship a helper for consistent cycle notes.",
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            with self.assertRaisesRegex(ValueError, "Missing required field: artifacts"):
+                write_cycle_record(payload, Path(tmpdir), state_path=Path("status/state.json"), state_mode="completed")
 
     def test_write_cycle_record_updates_state_in_completed_mode(self):
         payload = {
