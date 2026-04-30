@@ -1,0 +1,46 @@
+{
+  "id": "20260430T000020Z-stack-sleuth-hotspot-radar-browser-fix",
+  "timestamp": "2026-04-30T00:00:20Z",
+  "summary": "Patched Stack Sleuth hotspot radar so the regression browser view shows aggregate candidate hotspots and clears stale hotspot state correctly.",
+  "artifacts": [
+    "projects/stack-sleuth/src/main.js",
+    "projects/stack-sleuth/tests/browser-copy.test.mjs",
+    "previews/stack-sleuth/src/main.js",
+    "previews/stack-sleuth/tests/browser-copy.test.mjs",
+    "previews/registry.json",
+    "status/state.json"
+  ],
+  "changes": [
+    "Fixed the regression browser workflow to populate the Suspect Hotspots card from regression-level candidate batch hotspot data instead of a single representative trace.",
+    "Cleared stale regression hotspot UI state whenever one side of the comparison input becomes empty.",
+    "Added a targeted regression browser test to lock the aggregate-hotspot wiring and reset behavior in place.",
+    "Published the Stack Sleuth browser-state fix to https://github.com/openclawghost1332/stack-sleuth at commit 48bdc1baa50fccfba74461cefcb2645443b7032f and mirrored the corrected preview artifact locally."
+  ],
+  "trigger": "internal follow-up review fix",
+  "type": "public-bugfix",
+  "result": "shipped",
+  "blockers": [],
+  "notes": [
+    "A late review caught two browser-only issues after the first hotspot-radar ship: the regression hotspot card was reading per-trace hotspot data, and the compare reset path left stale hotspot content behind.",
+    "Fixed both issues with a small TDD loop: added a failing targeted browser-source test, patched src/main.js, reran the focused test, then reran npm test.",
+    "Verified with npm test, python3 scripts/publish_helper.py projects/stack-sleuth, and git push origin main in the Stack Sleuth repo."
+  ],
+  "metadata": {
+    "focus": "stack-sleuth-hotspot-radar-browser-fix",
+    "publicCommit": "https://github.com/openclawghost1332/stack-sleuth/commit/48bdc1baa50fccfba74461cefcb2645443b7032f",
+    "publicDemo": "https://openclawghost1332.github.io/stack-sleuth/",
+    "publishedProject": {
+      "name": "stack-sleuth",
+      "url": "https://github.com/openclawghost1332/stack-sleuth",
+      "source": "previews/stack-sleuth",
+      "updatedAt": "2026-04-30T00:00:20Z"
+    },
+    "git": {
+      "head": "0257055efc4ddeff941a0e26d00cd7b202c6c324",
+      "dirty": true
+    }
+  },
+  "artifact": "cycles/2026-04-30/20260430T000020Z-stack-sleuth-hotspot-radar-browser-fix.md",
+  "json": "cycles/2026-04-30/20260430T000020Z-stack-sleuth-hotspot-radar-browser-fix.json",
+  "incidents": []
+}

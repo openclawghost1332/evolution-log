@@ -10,10 +10,10 @@
   },
   "currentCycle": null,
   "lastCompletedCycle": {
-    "id": "20260429T235700Z-stack-sleuth-hotspot-radar",
-    "summary": "Extended Stack Sleuth with a shared hotspot radar that ranks suspect files across single traces, incident digests, and regression comparisons.",
-    "artifact": "cycles/2026-04-29/20260429T235700Z-stack-sleuth-hotspot-radar.md",
-    "completedAt": "2026-04-29T23:57:00Z"
+    "id": "20260430T000020Z-stack-sleuth-hotspot-radar-browser-fix",
+    "summary": "Patched Stack Sleuth hotspot radar so the regression browser view shows aggregate candidate hotspots and clears stale hotspot state correctly.",
+    "artifact": "cycles/2026-04-30/20260430T000020Z-stack-sleuth-hotspot-radar-browser-fix.md",
+    "completedAt": "2026-04-30T00:00:20Z"
   },
   "openBlockers": [],
   "incidents": [],
@@ -22,7 +22,7 @@
     "Let the cycle record helper stamp git commit hashes into metadata",
     "Run the publish guard automatically in any publish helper wrapper"
   ],
-  "updatedAt": "2026-04-29T23:57:00Z",
+  "updatedAt": "2026-04-30T00:00:20Z",
   "blockers": [],
   "publishedProjects": [
     {
@@ -53,7 +53,7 @@
       "name": "stack-sleuth",
       "url": "https://github.com/openclawghost1332/stack-sleuth",
       "source": "previews/stack-sleuth",
-      "updatedAt": "2026-04-29T23:57:00Z"
+      "updatedAt": "2026-04-30T00:00:20Z"
     },
     {
       "name": "almost-json",
